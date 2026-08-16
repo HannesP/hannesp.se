@@ -1,6 +1,7 @@
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const hud = document.getElementById('hud');
+const levelEl = document.getElementById('level');
 const scoreEl = document.getElementById('score');
 const hpEl = document.getElementById('hp');
 
@@ -26,8 +27,11 @@ function toPixelPoly(gridPoints) {
 // A level bundles everything the editor authors into one object: obstacle
 // polygons, marker points, and the player's start/goal grid positions.
 // Keeping it as a single object (rather than scattered top-level consts) is
-// what lets the game load different levels later on.
-const DEFAULT_LEVEL = {"obstacles":[{"grid":[[33,0],[32,1],[31,0]]},{"grid":[[27,0],[26,1],[25,0]]},{"grid":[[12,0],[11,1],[10,0]]},{"grid":[[16,0],[17,1],[18,0]]},{"grid":[[39,0],[39,29],[80,29],[80,0]]},{"grid":[[26,30],[26,24],[28,24],[28,22],[26,22],[26,14],[24,14],[24,30]]},{"grid":[[31,14],[29,14],[29,16],[31,16]]},{"grid":[[14,2],[18,6],[25,6],[29,2],[33,6],[33,24],[31,24],[31,9],[12,9],[12,14],[19,14],[19,16],[10,16]]},{"grid":[[10,6],[14,2],[13,6],[10,16]]},{"grid":[[10,6],[8,6],[8,9],[10,9]]},{"grid":[[10,28],[10,30],[12,30],[12,28]]},{"grid":[[3,6],[8,6],[8,9],[3,9]],"type":"oneway","dir":"S"},{"grid":[[10,19],[10,25],[12,25],[12,21],[17,21],[17,28],[19,28],[19,19]]},{"grid":[[24,30],[39,30],[39,29],[80,29],[80,39],[40,40],[40,40],[0,40],[0,6],[3,6],[3,28],[10,28],[10,30],[12,30],[12,28],[24,28]]}],"markers":[{"gx":3,"gy":3},{"gx":8,"gy":3},{"gx":15,"gy":11},{"gx":14,"gy":23},{"gx":22,"gy":25}],"keys":[],"start":{"gx":7,"gy":15},"goal":{"gx":7,"gy":12}};
+// what lets the game load different levels, and to progress between them.
+const LEVELS = [
+  {"obstacles":[{"grid":[[33,0],[32,1],[31,0]]},{"grid":[[27,0],[26,1],[25,0]]},{"grid":[[12,0],[11,1],[10,0]]},{"grid":[[16,0],[17,1],[18,0]]},{"grid":[[39,0],[39,29],[80,29],[80,0]]},{"grid":[[26,30],[26,24],[28,24],[28,22],[26,22],[26,14],[24,14],[24,30]]},{"grid":[[31,14],[29,14],[29,16],[31,16]]},{"grid":[[14,2],[18,6],[25,6],[29,2],[33,6],[33,24],[31,24],[31,9],[12,9],[12,14],[19,14],[19,16],[10,16]]},{"grid":[[10,6],[14,2],[13,6],[10,16]]},{"grid":[[10,6],[8,6],[8,9],[10,9]]},{"grid":[[10,28],[10,30],[12,30],[12,28]]},{"grid":[[3,6],[8,6],[8,9],[3,9]],"type":"oneway","dir":"S"},{"grid":[[10,19],[10,25],[12,25],[12,21],[17,21],[17,28],[19,28],[19,19]]},{"grid":[[24,30],[39,30],[39,29],[80,29],[80,39],[40,40],[40,40],[0,40],[0,6],[3,6],[3,28],[10,28],[10,30],[12,30],[12,28],[24,28]]}],"markers":[{"gx":3,"gy":3},{"gx":8,"gy":3},{"gx":15,"gy":11},{"gx":14,"gy":23},{"gx":22,"gy":25}],"keys":[],"start":{"gx":7,"gy":15},"goal":{"gx":7,"gy":12}},
+  {"obstacles":[{"grid":[[2,41],[2,60],[19,60],[19,57],[7,57],[7,41]]},{"grid":[[17,25],[17,13],[19,13],[19,25]]},{"grid":[[25,13],[25,11],[27,11],[27,13]],"type":"keyhole","color":"red"},{"grid":[[27,25],[27,13],[25,13],[25,25]]},{"grid":[[17,55],[17,57],[19,57],[19,55]],"type":"keyhole","color":"blue"},{"grid":[[25,55],[25,57],[27,57],[27,55]],"type":"keyhole","color":"yellow"},{"grid":[[19,43],[19,55],[17,55],[17,43]]},{"grid":[[25,25],[25,27],[27,27],[27,25]],"type":"oneway","dir":"E"},{"grid":[[17,43],[17,41],[19,41],[19,43]],"type":"oneway","dir":"W"},{"grid":[[27,27],[25,27],[25,55],[27,55]]},{"grid":[[19,41],[2,41],[2,60],[0,60],[0,0],[49,0],[49,60],[25,60],[25,57],[36,57],[36,41],[27,41],[27,27],[36,27],[36,11],[39,11],[39,4],[2,4],[2,27]]},{"grid":[[4,27],[19,27],[19,41],[8,32],[4,29]]},{"grid":[[2,27],[4,29],[4,27],[7,27],[7,11],[39,11],[39,4],[2,4]]}],"markers":[{"gx":12,"gy":22},{"gx":31,"gy":22},{"gx":32,"gy":45},{"gx":12,"gy":53},{"gx":32,"gy":53}],"keys":[{"gx":12,"gy":16,"color":"red"},{"gx":31,"gy":16,"color":"blue"},{"gx":12,"gy":45,"color":"yellow"}],"start":{"gx":22,"gy":54},"goal":{"gx":22,"gy":58}},
+];
 
 // Obstacles: polygons whose vertices are given in grid units (multiples of GRID)
 const obstacles = [];
@@ -80,7 +84,13 @@ const player = {
 };
 
 // ---- Level persistence (localStorage) ----
-const LEVEL_STORAGE_KEY = 'stickGameLevel';
+// Each level's edits are stored under its own key so editing level 2 never
+// touches level 1's saved data. The player's current level also persists,
+// so progress survives a page reload.
+const LEVEL_STORAGE_PREFIX = 'stickGameLevel_';
+const CURRENT_LEVEL_STORAGE_KEY = 'stickGameCurrentLevel';
+let currentLevelIndex = 0;
+
 function saveLevel() {
   const data = {
     obstacles,
@@ -89,11 +99,11 @@ function saveLevel() {
     start: player.startGrid,
     goal: player.goalGrid,
   };
-  localStorage.setItem(LEVEL_STORAGE_KEY, JSON.stringify(data));
+  localStorage.setItem(LEVEL_STORAGE_PREFIX + currentLevelIndex, JSON.stringify(data));
 }
 // Populates obstacles/markers/keys/player start & goal from a level object
 // ({obstacles, markers, keys, start, goal}), deep-copying so in-game edits
-// never mutate the source data (DEFAULT_LEVEL or a parsed save).
+// never mutate the source data (a LEVELS entry or a parsed save).
 function applyLevel(level) {
   obstacles.length = 0;
   for (const o of level.obstacles) {
@@ -108,20 +118,39 @@ function applyLevel(level) {
   player.x = player.startGrid.gx * GRID;
   player.y = player.startGrid.gy * GRID;
 }
-function loadLevel() {
-  const raw = localStorage.getItem(LEVEL_STORAGE_KEY);
+// Loads the level at `index` (its saved edits if present, otherwise the
+// authored LEVELS entry) and makes it the active level.
+function loadLevel(index) {
+  currentLevelIndex = index;
+  const raw = localStorage.getItem(LEVEL_STORAGE_PREFIX + index);
   if (!raw) {
-    applyLevel(DEFAULT_LEVEL);
+    applyLevel(LEVELS[index]);
     return;
   }
   try {
     applyLevel(JSON.parse(raw));
   } catch (e) {
     console.warn('Failed to load saved level, using default:', e);
-    applyLevel(DEFAULT_LEVEL);
+    applyLevel(LEVELS[index]);
   }
 }
-loadLevel();
+// Switches the active level, persists the choice, and resets play state
+// (HP, position, collected markers/keys) for a clean start on the new level.
+function goToLevel(index) {
+  index = Math.max(0, Math.min(LEVELS.length - 1, index));
+  loadLevel(index);
+  localStorage.setItem(CURRENT_LEVEL_STORAGE_KEY, String(index));
+  restart();
+  updateHud();
+}
+
+let startLevelIndex = 0;
+const savedIndexRaw = localStorage.getItem(CURRENT_LEVEL_STORAGE_KEY);
+if (savedIndexRaw !== null) {
+  const parsed = parseInt(savedIndexRaw, 10);
+  if (!Number.isNaN(parsed) && parsed >= 0 && parsed < LEVELS.length) startLevelIndex = parsed;
+}
+loadLevel(startLevelIndex);
 resetRemainingMarkers();
 resetRemainingKeys();
 
@@ -183,8 +212,13 @@ window.addEventListener('keydown', e => {
   if (e.key === 'e' || e.key === 'E') {
     setEditorMode(!editorMode);
   }
+  if (e.key === 'n' || e.key === 'N') goToLevel((currentLevelIndex + 1) % LEVELS.length);
   if (!editorMode) {
-    if ((player.gameOver || player.win) && e.key === 'Enter') restart();
+    if (player.gameOver && e.key === 'Enter') restart();
+    if (player.win && e.key === 'Enter') {
+      if (currentLevelIndex < LEVELS.length - 1) goToLevel(currentLevelIndex + 1);
+      else goToLevel(0);
+    }
     return;
   }
   if (e.key === 'Enter') finalizePolygon();
@@ -658,7 +692,7 @@ function updateHud() {
       '<br>' +
       toolHelp[editorTool];
   } else {
-    hud.innerHTML = '<b>Arrow keys</b> to move &middot; <b>E</b> for level editor';
+    hud.innerHTML = '<b>Arrow keys</b> to move &middot; <b>E</b> for level editor &middot; <b>N</b> for next level';
   }
 }
 updateHud();
@@ -1085,6 +1119,7 @@ function drawPlayer() {
 updateCamera();
 updateScore();
 updateHp();
+updateLevelLabel();
 let lastTime = performance.now();
 function distToSegment(px, py, x1, y1, x2, y2) {
   const dx = x2 - x1, dy = y2 - y1;
@@ -1173,6 +1208,11 @@ function restart() {
   resetRemainingKeys();
   updateHp();
   updateScore();
+  updateLevelLabel();
+}
+
+function updateLevelLabel() {
+  levelEl.textContent = `Level ${currentLevelIndex + 1} / ${LEVELS.length}`;
 }
 
 function updateHp() {
@@ -1349,17 +1389,19 @@ function drawGameOver() {
 }
 
 function drawWinScreen() {
+  const isLastLevel = currentLevelIndex >= LEVELS.length - 1;
+
   ctx.fillStyle = 'rgba(0,0,0,0.7)';
   ctx.fillRect(0, 0, VIEW_W, VIEW_H);
 
   ctx.textAlign = 'center';
   ctx.fillStyle = '#ffd700';
   ctx.font = 'bold 48px monospace';
-  ctx.fillText('LEVEL COMPLETE', VIEW_W / 2, VIEW_H / 2 - 10);
+  ctx.fillText(isLastLevel ? 'ALL LEVELS COMPLETE' : 'LEVEL COMPLETE', VIEW_W / 2, VIEW_H / 2 - 10);
 
   ctx.fillStyle = '#ccc';
   ctx.font = '18px monospace';
-  ctx.fillText('Press Enter to restart', VIEW_W / 2, VIEW_H / 2 + 30);
+  ctx.fillText(isLastLevel ? 'Press Enter to play again' : 'Press Enter for next level', VIEW_W / 2, VIEW_H / 2 + 30);
   ctx.textAlign = 'left';
 }
 
