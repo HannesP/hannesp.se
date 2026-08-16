@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stick Game</title>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #111;
+    overflow: hidden;
+    font-family: monospace;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #layout {
+    display: flex;
+    flex-direction: row;
+  }
+  canvas {
+    display: block;
+    background: #1b1b1b;
+  }
+  #sidebar {
+    width: 260px;
+    height: 600px;
+    box-sizing: border-box;
+    background: #181818;
+    border-left: 1px solid #333;
+    padding: 12px;
+    overflow-y: auto;
+  }
+  #hud {
+    color: #ccc;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  #hud b { color: #fff; }
+  #score {
+    color: #ffe066;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  #hp {
+    color: #ff5c5c;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+<div id="layout">
+  <canvas id="game"></canvas>
+  <div id="sidebar">
+    <div id="score"></div>
+    <div id="hp"></div>
+    <div id="hud"></div>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
