@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Duckaskjut</title>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #14161a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  #wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  #gameRow {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  #hud {
+    color: #ccc;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  #editModeToggle {
+    background: #23262c;
+    color: #ccc;
+    border: 1px solid #3a3d44;
+    border-radius: 3px;
+    padding: 3px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  #editModeToggle:hover {
+    border-color: #5a5f68;
+  }
+  #editModeToggle.active {
+    background: #6fcf6f;
+    color: #14161a;
+    border-color: #6fcf6f;
+  }
+  canvas {
+    background: #000;
+    border: 2px solid #3a3d44;
+    image-rendering: pixelated;
+  }
+  #editorBar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    font-size: 12px;
+    color: #ccc;
+    width: 150px;
+    flex-shrink: 0;
+  }
+  #editorBar.hidden {
+    display: none;
+  }
+  #editorBar button {
+    background: #23262c;
+    color: #ccc;
+    border: 1px solid #3a3d44;
+    border-radius: 3px;
+    padding: 6px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    text-align: left;
+  }
+  #editorBar button:hover {
+    border-color: #5a5f68;
+  }
+  #editorBar button.active {
+    background: #e0553b;
+    color: #14161a;
+    border-color: #e0553b;
+  }
+  #editorBar .sep {
+    height: 1px;
+    background: #3a3d44;
+    margin: 2px 0;
+  }
+  #editorBar .hint {
+    font-size: 11px;
+    color: #999;
+    line-height: 1.5;
+  }
+  #controlsPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    color: #ccc;
+    width: 170px;
+    flex-shrink: 0;
+  }
+  #controlsPanel h2 {
+    margin: 0 0 2px;
+    font-size: 12px;
+    color: #999;
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  #controlsPanel .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  #controlsPanel .row span:last-child {
+    color: #999;
+    text-align: right;
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="hud">
+    <span>Room: <span id="roomLabel">1,1</span> / <span id="roomTotal"></span></span>
+    <span id="statusLabel"></span>
+    <span id="healthLabel"></span>
+    <span id="ammoLabel"></span>
+    <button id="editModeToggle">Edit mode (E)</button>
+  </div>
+  <div id="gameRow">
+    <div id="editorBar" class="hidden">
+      <button data-brush="floorA">1 Floor A</button>
+      <button data-brush="floorB">2 Floor B</button>
+      <button data-brush="wall">3 Wall</button>
+      <button data-brush="obstacle">4 Obstacle</button>
+      <button data-brush="cover">5 Cover</button>
+      <button data-brush="barrel">6 Barrel</button>
+      <button data-brush="enemy">7 Enemy</button>
+      <button data-brush="erase">8 Erase</button>
+      <button data-brush="start">9 Start point</button>
+      <button data-brush="healthpack">0 Health pack</button>
+      <button data-brush="beerglass">Beer glass</button>
+      <button data-brush="whiskeybottle">Whiskey bottle</button>
+      <button data-brush="chair">Chair</button>
+      <span class="sep"></span>
+      <button id="editorExport">Export (P)</button>
+      <button id="editorImport">Import (O)</button>
+      <span class="sep"></span>
+      <span class="hint">Room <span id="editorRoomLabel"></span></span>
+      <span class="hint">Switch room: [ ] , .</span>
+      <span class="hint">Drag = move</span>
+      <span class="hint">Right-click = delete</span>
+    </div>
+    <canvas id="game"></canvas>
+    <div id="controlsPanel">
+      <h2>Controls</h2>
+      <div class="row"><span>Turn</span><span>A/D</span></div>
+      <div class="row"><span>Move</span><span>W/S</span></div>
+      <div class="row"><span>Lock aim + free move</span><span>Shift+WASD</span></div>
+      <div class="row"><span>Shoot</span><span>Space</span></div>
+      <div class="row"><span>Reload</span><span>R</span></div>
+      <div class="row"><span>Switch weapon</span><span>Q</span></div>
+      <div class="row"><span>Crouch</span><span>C</span></div>
+    </div>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
