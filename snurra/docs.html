@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>snurra docs</title>
+    <style>
+      :root {
+        --bg: #f6f5f2;
+        --surface: #ffffff;
+        --text: #1f2328;
+        --muted: #6b7280;
+        --line: #e4e2dc;
+        --accent: #2f6f5e;
+        --err: #b42318;
+        --code-bg: #efede8;
+        --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #16181a;
+          --surface: #1e2124;
+          --text: #e6e6e3;
+          --muted: #8b9199;
+          --line: #2d3136;
+          --accent: #6fc2a8;
+          --err: #ff8b7e;
+          --code-bg: #25292d;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 15px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      a { color: var(--accent); }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+      }
+      header h1 { margin: 0; font-size: 18px; letter-spacing: 0.02em; }
+      header h1 span { color: var(--muted); font-weight: 400; }
+      .layout {
+        display: grid;
+        grid-template-columns: 200px minmax(0, 1fr);
+        gap: 32px;
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 16px 64px;
+        align-items: start;
+      }
+      nav { position: sticky; top: 16px; font-size: 14px; }
+      nav ul { list-style: none; margin: 0; padding: 0; }
+      nav li { margin: 4px 0; }
+      nav a { text-decoration: none; color: var(--muted); }
+      nav a:hover { color: var(--accent); }
+      @media (max-width: 760px) {
+        .layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
+        nav { position: static; margin-bottom: 16px; }
+        nav ul { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+      }
+      article {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 8px 28px 28px;
+        min-width: 0;
+      }
+      h2 { margin: 36px 0 8px; font-size: 20px; scroll-margin-top: 16px; }
+      h3 { margin: 24px 0 4px; font-size: 15px; }
+      p, ul, ol { margin: 8px 0; }
+      li { margin: 2px 0; }
+      code {
+        font-family: var(--mono);
+        font-size: 0.9em;
+        background: var(--code-bg);
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.55;
+        background: var(--code-bg);
+        border-radius: 6px;
+        padding: 10px 14px;
+        margin: 10px 0;
+        overflow-x: auto;
+      }
+      pre code { background: none; padding: 0; font-size: inherit; }
+      table { border-collapse: collapse; margin: 10px 0; font-size: 14px; display: block; overflow-x: auto; }
+      th, td { text-align: left; padding: 4px 14px 4px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { color: var(--muted); font-weight: 600; }
+      .note { color: var(--muted); }
+      .lead { font-size: 16px; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>snurra <span>docs</span></h1>
+      <a href="./">← Back to the editor</a>
+    </header>
+    <div class="layout">
+      <nav aria-label="On this page">
+        <ul>
+          <li><a href="#start">Getting started</a></li>
+          <li><a href="#values">Values and names</a></li>
+          <li><a href="#math">Operators and functions</a></li>
+          <li><a href="#logic">Conditions</a></li>
+          <li><a href="#dates">Dates</a></li>
+          <li><a href="#lists">Lists</a></li>
+          <li><a href="#tables">Tables</a></li>
+          <li><a href="#filter">Filtering and lookups</a></li>
+          <li><a href="#columns">New columns: with</a></li>
+          <li><a href="#groups">Grouping: by</a></li>
+          <li><a href="#series">Series</a></li>
+          <li><a href="#paste">Pasting data</a></li>
+          <li><a href="#hidden">Hiding lines</a></li>
+          <li><a href="#errors">Errors</a></li>
+          <li><a href="#views">The editor</a></li>
+        </ul>
+      </nav>
+      <article>
+        <p class="lead">
+          A snurra document is plain text that calculates as you type. Write what you know, say how the rest follows from
+          it, and hand the document to someone who can change the numbers and watch the answers move.
+        </p>
+
+        <h2 id="start">Getting started</h2>
+        <p>Every line is <code>name = expression</code>. Everything after <code>#</code> is a comment.</p>
+        <pre data-snurra><code># Mortgage
+loan = 8_000_000
+interest = 3%
+amortization = 2%
+
+mortgage = (loan * amortization + loan * interest) / 12   # per month</code></pre>
+        <p>
+          A line whose right side is just a value (<code>loan = 8_000_000</code>) is an <strong>input</strong>: it
+          appears in the Inputs panel as a field anyone can change. Any other line is <strong>calculated</strong>, and
+          its result shows next to it and in the Results panel. There is no run button; the whole document recalculates
+          on every edit.
+        </p>
+        <p>
+          Try the <strong>Examples</strong> menu in the header to open a ready-made document. Choosing one replaces what
+          you have, and undo (Ctrl or Cmd+Z) brings it back.
+        </p>
+
+        <h2 id="values">Values and names</h2>
+        <h3>Kinds of value</h3>
+        <table>
+          <tr><th>Kind</th><th>Written</th><th>Notes</th></tr>
+          <tr><td>Number</td><td><code>1250.50</code>, <code>8_000_000</code>, <code>3%</code></td><td><code>.</code> is always the decimal point; <code>_</code> is for readability; <code>3%</code> means 0.03</td></tr>
+          <tr><td>Text</td><td><code>"Sales"</code></td><td>Compared without regard to case</td></tr>
+          <tr><td>True/false</td><td><code>true</code>, <code>false</code></td><td></td></tr>
+          <tr><td>Date</td><td><code>2024-03-01</code></td><td>Always year-month-day</td></tr>
+          <tr><td>Duration</td><td><code>30 days</code>, <code>1 month</code></td><td>Needs a space between number and unit</td></tr>
+        </table>
+        <p>
+          Arithmetic is exact decimal arithmetic, never floating point, so <code>0.1 + 0.2</code> is <code>0.3</code>.
+          Results show up to two decimals. A document means the same on every computer, in every locale.
+        </p>
+        <p>
+          There is no scientific notation (<code>1.3e8</code>) and no suffix like <code>3M</code>; write
+          <code>130_000_000</code>.
+        </p>
+
+        <h3>Names</h3>
+        <ul>
+          <li>Letters (including å, ä, ö), digits and <code>_</code>. No spaces, and no starting with a digit.</li>
+          <li>Case does not matter: <code>Loan</code> and <code>loan</code> are the same name. The first spelling is the one shown.</li>
+          <li>A name can only be used on lines <em>below</em> where it is defined. Using it earlier tells you which line to move.</li>
+          <li>Each name can be defined once. Words that mean something in the language (<code>where</code>, <code>by</code>, <code>table</code>, <code>sort</code>, <code>with</code>, <code>row</code>, <code>prev</code>, function names, …) can't be names.</li>
+        </ul>
+
+        <h2 id="math">Operators and functions</h2>
+        <p>
+          <code>+ - * /</code>, <code>^</code> for power, and parentheses. Precedence is the usual one, and
+          <code>-2^2</code> is −4. There is no <code>%</code> operator: <code>3%</code> is just the number 0.03, so
+          <code>100 + 20%</code> is 100.2, not 120. For 20 percent more, write <code>100 * (1 + 20%)</code>.
+        </p>
+        <table>
+          <tr><th>Function</th><th>What it does</th></tr>
+          <tr><td><code>min</code>, <code>max</code>, <code>avg</code>, <code>sum</code></td><td>Over several values, <code>max(0, x)</code>, or over one column or list, <code>sum(budget.limit)</code></td></tr>
+          <tr><td><code>count</code></td><td>Non-blank values in a column, or rows in a table</td></tr>
+          <tr><td><code>mode</code></td><td>The most common value (a tie goes to the smallest)</td></tr>
+          <tr><td><code>first</code>, <code>last</code></td><td>First or last filled value of a column</td></tr>
+          <tr><td><code>abs</code>, <code>floor</code>, <code>ceil</code></td><td>Absolute value; whole number below or above</td></tr>
+          <tr><td><code>round(x)</code>, <code>round(x, n)</code></td><td>Rounds half away from zero, optionally to <code>n</code> decimals</td></tr>
+          <tr><td><code>iff(cond, a, b)</code></td><td><code>a</code> if the condition holds, otherwise <code>b</code></td></tr>
+        </table>
+        <p>
+          Function names are case-insensitive. <code>sum(5)</code> is an error: with one argument, the aggregate functions
+          need a column.
+        </p>
+
+        <h2 id="logic">Conditions</h2>
+        <p>
+          Compare with <code>=</code>, <code>&lt;&gt;</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>,
+          <code>&gt;=</code>. At the start of a line <code>=</code> assigns; anywhere else it compares. Combine with
+          <code>and</code>, <code>or</code> and <code>not</code>.
+        </p>
+        <pre data-snurra><code>income = 42_000
+loan = 600_000
+ok = income * 5 > loan and not (loan = 0)
+fee = iff(ok, 0, 500)</code></pre>
+        <p>
+          <code>iff</code>, <code>and</code> and <code>or</code> only evaluate what they need, so
+          <code>iff(x = 0, 0, 1 / x)</code> is safe when <code>x</code> is 0.
+        </p>
+
+        <h2 id="dates">Dates</h2>
+        <p>
+          A date is written <code>2024-03-01</code>. There is deliberately no <code>today()</code>, since that would make
+          the same document mean something different tomorrow. Make today an input instead and let the reader set it.
+        </p>
+        <pre data-snurra><code>today = 2024-03-15
+invoice_date = 2024-02-20
+due = invoice_date + 30 days
+days_late = iff(today > due, today - due, 0)
+quarter = floor((month_of(due) + 2) / 3)</code></pre>
+        <ul>
+          <li><code>date - date</code> is a number of days; <code>date + 30</code> and <code>date + 1 month</code> are dates.</li>
+          <li>Month arithmetic keeps the day, or clamps to the end of a shorter month: 31 January plus 1 month is 29 February (2024).</li>
+          <li>Functions: <code>year_of</code>, <code>month_of</code>, <code>day_of</code>, <code>weekday_of</code> (1 is Monday), <code>add_months(d, n)</code> and <code>month_start(d)</code>.</li>
+          <li><code>month_start(d)</code> is the usual key for grouping by month. Such dates are shown as a month name and year.</li>
+          <li>A date never equals text: <code>d = "2024-01-01"</code> is an error. Write it without quotes.</li>
+          <li>Impossible dates (<code>2023-02-29</code>) are errors, never rolled over to the next month. <code>2024 - 03 - 01</code> with spaces is subtraction.</li>
+        </ul>
+
+        <h2 id="lists">Lists</h2>
+        <p>Commas make a list. Everything that works on one value works on every item.</p>
+        <pre data-snurra><code>weights = 60, 70, 80
+h = 1.8
+bmi = weights / h / h
+tall = weights where weights > 65
+total = sum(weights)</code></pre>
+        <p>
+          Two lists combine item by item if they have the same length; a list and a single value always combine. A list
+          is an input when it is written out with values only, so it shows in the form.
+        </p>
+
+        <h2 id="tables">Tables</h2>
+        <p>
+          <code>name = table</code> followed by indented lines: the first is the column names, the rest are rows. Cells are
+          separated by commas. Leave a cell empty for "no value".
+        </p>
+        <pre data-snurra><code>budget = table
+  dept,  limit
+  Sales, 50000
+  Ops,   30000
+  Admin,</code></pre>
+        <ul>
+          <li><code>budget.limit</code> is a whole column. Columns of the same table combine row by row: <code>budget.limit * 1.25</code>.</li>
+          <li>Text with a comma in it is quoted: <code>"Smith, John"</code>. A column is numbers if every filled cell is a number, otherwise text.</li>
+          <li>A blank is not zero. Totals skip blanks, and arithmetic with a blank gives a blank.</li>
+          <li>A row with the wrong number of cells makes the whole table an error, so a total never silently skips data.</li>
+          <li>Tables are inputs: in the Inputs panel they are an editable grid. Tab and Enter move between cells, and typing in the empty last row adds a row.</li>
+          <li>Columns line up automatically as you type. The spaces are only for reading.</li>
+          <li><code>table of weights, bmi</code> builds a table from lists of the same length.</li>
+        </ul>
+        <p>
+          A table with many columns can be narrowed to the ones worth showing: name them after <code>table of</code>.
+          The columns come out in the order you write them, so this also reorders.
+        </p>
+        <pre data-snurra><code>wide = table
+  dept,  limit, owner, phone,    level
+  Sales, 50000, Anna,  555-0101, 2
+  Ops,   30000, Bo,    555-0102, 3
+
+overview = table of wide.dept, wide.limit</code></pre>
+        <p>
+          To narrow a sorted or filtered table, give that table a name first and pick from it:
+          <code>top = wide sort limit desc limit 1</code>, then <code>table of top.dept, top.limit</code>.
+        </p>
+
+        <h2 id="filter">Filtering and lookups</h2>
+        <p>
+          <code>where</code> keeps the rows (or list items) that match. <code>lookup</code> is the same, but insists on
+          exactly one match, and gives a single value or a row.
+        </p>
+        <pre data-snurra><code>budget = table
+  dept,  limit, owner
+  Sales, 50000, Ana
+  Ops,   30000, Ben
+
+expenses = table
+  dept,  amount
+  Sales, 1200
+  Ops,   400
+  Sales, 800
+
+big = expenses where amount > 500
+ops_limit = lookup budget.limit where budget.dept = "Ops"
+b = lookup budget where budget.dept = "Sales"
+sales_owner = b.owner
+n_big = count(expenses.amount where expenses.amount > 500)</code></pre>
+        <ul>
+          <li>A <code>where</code> runs to the end of the line. Parenthesise it to use it inside a bigger expression.</li>
+          <li>No match, or more than one, is an error that says which value was missing or ambiguous. Matching is exact.</li>
+          <li>If a bare name could mean a column of two tables, or a column and one of your own names, you get an error that lists the candidates. Write <code>table.column</code> to be explicit.</li>
+        </ul>
+
+        <h2 id="columns">New columns: with</h2>
+        <p>
+          <code>with</code> adds calculated columns to a table and keeps every row, in the same order. Inside it, column
+          names mean "this row's value".
+        </p>
+        <pre data-snurra><code>utgifter = table
+  dept, belopp
+  Sales, 1200
+  Ops, 400
+  Sales, 800
+
+total = sum(utgifter.belopp)
+andel = utgifter with
+  share = belopp / total
+  pct = round(share * 100, 1)</code></pre>
+        <p>
+          Because <code>with</code> works one row at a time, a total over the same table has to be a line of its own, as
+          <code>total</code> is above. <code>row</code> is the row number, <code>prev</code> the value on the row before,
+          and <code>prev(n)</code> goes back <code>n</code> rows, which gives running totals:
+          <code>balance = iff(row = 1, amount, prev + amount)</code>.
+        </p>
+
+        <h2 id="groups">Grouping: by</h2>
+        <p>
+          <code>table by key</code> makes one row per distinct key. The indented lines below are the columns; inside
+          <code>sum</code>, <code>avg</code>, <code>min</code>, <code>max</code>, <code>count</code> and friends you see the
+          group's source rows.
+        </p>
+        <pre data-snurra><code>expenses = table
+  dept,  amount
+  Sales, 1200
+  Ops,   400
+  Sales, 800
+
+budget = table
+  dept,  limit
+  Sales, 50000
+  Ops,   30000
+
+per_dept = expenses by dept
+  total = sum(amount)
+  limit = lookup budget.limit where budget.dept = expenses.dept
+  left = limit - total
+  sort total desc</code></pre>
+        <ul>
+          <li>Several keys are comma-separated. A computed key needs a name: <code>by month = month_start(date)</code>.</li>
+          <li>Rows come out sorted by the keys. A last <code>sort total desc</code> line sorts by something else (<code>asc</code> is the default).</li>
+          <li>Groups match without regard to case. A blank key becomes a visible <code>(blank)</code> group.</li>
+          <li>Using a column that has many values per group outside an aggregate is an error, with the fix in the message.</li>
+        </ul>
+
+        <h3>Sorting and limiting</h3>
+        <p>
+          Both <code>by</code> and <code>with</code> take a last <code>sort</code> line and a <code>limit</code> line after
+          it. <code>limit 3</code> keeps at most three rows: the first three, in whatever order the table has. Sort first and
+          you get a top list.
+        </p>
+        <pre data-snurra><code>utgifter = table
+  vem,  belopp
+  Anna, 400
+  Bo,   900
+  Cleo, 150
+  Dan,  700
+
+top_spenders = utgifter by vem
+  total = sum(belopp)
+  sort total desc
+  limit 3
+
+biggest = utgifter with
+  double = belopp * 2
+  sort belopp desc
+  limit 2</code></pre>
+        <ul>
+          <li>The result says "3 of 4 rows" so a reader can see that rows were left out. Anything calculated from it afterwards only sees the kept rows.</li>
+          <li>The number can be a name, so a reader can change how many to show: <code>limit shown</code>. It must be a whole number, 0 or more.</li>
+          <li>Rows that tie at the cut-off stay in the order they had, so the result never changes between runs.</li>
+          <li>In a <code>with</code>, the sort happens last: <code>row</code> and <code>prev</code> still follow the original order, and the sort can use any column.</li>
+          <li><code>limit</code> is only a keyword at the start of a line with no <code>=</code>, so it still works as a column name.</li>
+        </ul>
+        <p>
+          When all you want is the top of a table, no <code>by</code> or <code>with</code> is needed:
+          <code>sort</code> and <code>limit</code> can end any table expression, on one line.
+        </p>
+        <pre data-snurra><code>utgifter = table
+  vem,  belopp
+  Anna, 400
+  Bo,   900
+  Cleo, 150
+  Dan,  700
+
+top2 = utgifter sort belopp desc limit 2
+big = utgifter where belopp > 300 sort belopp, vem</code></pre>
+        <ul>
+          <li>They come last in the chain, <code>sort</code> first: nothing, not even a <code>where</code>, can follow them. Either one can be left out.</li>
+          <li>The keys work as in a block (several, <code>asc</code> or <code>desc</code>, expressions over the columns), and so does the number.</li>
+        </ul>
+
+        <h2 id="series">Series</h2>
+        <p>
+          When each row builds on the one before (savings, loans, schedules) use a series: a counter and a range with
+          <code>..</code>.
+        </p>
+        <pre data-snurra><code>start = 10_000
+rate = 5%
+deposit = 1_000
+
+growth = year 0..30
+  balance = iff(row = 1, start, prev * (1 + rate) + deposit)
+  interest = iff(row = 1, 0, balance - prev.balance)
+
+final = last(growth.balance)</code></pre>
+        <p>
+          <code>prev</code> is this column in the previous row, <code>prev.name</code> any column of the previous row.
+          Reaching before the first row is an error, which is why the first row is written out with <code>iff(row = 1, …)</code>.
+          Series have at most 10,000 rows, and the result is an ordinary table.
+        </p>
+
+        <h2 id="paste">Pasting data</h2>
+        <p>
+          Paste a table copied from Excel, Google Sheets or a bank export onto an empty line, and it becomes a
+          <code>data = table</code> in the document's own spelling. Numbers like <code>33 333,33</code> or
+          <code>1.234,56</code> become <code>33333.33</code> and <code>1234.56</code>; dates like
+          <code>31.12.2024</code> become <code>2024-12-31</code>. Pasting below a table's last row adds rows to it.
+        </p>
+        <p>
+          snurra never guesses silently. If a value is ambiguous (<code>1,234</code>, or <code>03/04/2024</code>) and the
+          rest of the column can't settle it, the whole column is pasted as text, and a comment above the table says why.
+          Summing a text column is an error, so nothing goes wrong unnoticed.
+        </p>
+
+        <h2 id="hidden">Hiding lines</h2>
+        <p>
+          Put <code>@hidden</code> at the end of a line, before any comment, to keep it out of what the reader sees.
+          Hidden inputs become constants the reader can't change; hidden calculations are left out of the results.
+        </p>
+        <pre data-snurra><code>price = 100
+moms = 25%                       @hidden
+brutto = price * (1 + moms)      @hidden  # shown to the author only
+total = brutto * 2</code></pre>
+        <p>
+          A hint never changes what a line means. An error is never hidden. The editor shows hidden values dimmed behind
+          a "Show N hidden" switch, and a reader is told that something is hidden.
+        </p>
+
+        <h2 id="errors">Errors</h2>
+        <p>
+          A mistake on one line is shown on that line, in plain language, and never stops the rest of the document. Lines
+          that depend on a broken line show the same problem, so a wrong number is never shown quietly. While you type,
+          new errors are held back for a moment so half-written lines don't flash red.
+        </p>
+        <p>
+          Documents always finish: there are no loops or recursion beyond the bounded series, and nothing in a document
+          is ever run as code.
+        </p>
+
+        <h2 id="views">The editor</h2>
+        <ul>
+          <li><strong>Code</strong> shows the editor alone, with results beside each line, and calculated tables drawn as grids under their statements. <strong>Code &amp; results</strong> adds the Inputs and Results panels. <strong>Inputs &amp; results</strong> hides the code and leaves only the inputs and results: that's the view for someone who just wants to use the document. <strong>Results</strong> shows only the results, with no code and no inputs, for someone who only cares about the answers.</li>
+          <li>Writing <code>name = number</code> adds a field to the Inputs panel. Hovering a field or its line links the two.</li>
+          <li>Your document is saved in your browser as you type.</li>
+          <li>Autocomplete offers your names and the functions.</li>
+        </ul>
+      </article>
+    </div>
+  </body>
+</html>
