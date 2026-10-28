@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>snurra</title>
+    <script type="module" crossorigin src="./assets/main-B1Jbl1nz.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/main-CzToMNBc.css">
+  </head>
+  <body>
+    <header>
+      <h1>snurra</h1>
+      <div class="header-actions">
+        <div class="views" role="group" aria-label="View">
+          <button type="button" data-view="code" title="Code only">Code</button>
+          <button type="button" data-view="code-results" title="Code, with the results beside it">Code &amp; results</button>
+          <button type="button" data-view="inputs-results" title="Inputs and results only, without the code">Inputs &amp; results</button>
+          <button type="button" data-view="output" title="Results only, without the code or the inputs">Results</button>
+        </div>
+        <select id="examples" aria-label="Open an example">
+          <option value="">Examples…</option>
+        </select>
+        <a class="docs-link" href="docs.html">Docs</a>
+      </div>
+    </header>
+    <main data-view="code-results">
+      <section id="editor" aria-label="Document"></section>
+      <aside>
+        <div class="pane" id="pane-inputs">
+          <section aria-label="Inputs">
+            <p class="hint" id="inputs-hint">Write name = number and it shows up here as something to change.</p>
+            <div id="inputs"></div>
+          </section>
+        </div>
+        <div class="pane" id="pane-outputs">
+          <section aria-label="Results">
+            <label class="hidden-toggle" id="hidden-toggle" hidden>
+              <input type="checkbox" id="show-hidden" />
+              <span id="hidden-count"></span>
+            </label>
+            <div id="results"></div>
+          </section>
+          <section id="problems-section" hidden>
+            <h2>Problems</h2>
+            <div id="problems"></div>
+          </section>
+        </div>
+      </aside>
+    </main>
+  </body>
+</html>
