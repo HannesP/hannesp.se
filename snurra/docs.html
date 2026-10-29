@@ -148,7 +148,7 @@
         </p>
 
         <h2 id="start">Getting started</h2>
-        <p>Every line is <code>name = expression</code>. Everything after <code>#</code> is a comment.</p>
+        <p>Every line is <code>name = expression</code>, or just an expression. Everything after <code>#</code> is a comment.</p>
         <pre data-snurra><code># Mortgage
 loan = 8_000_000
 interest = 3%
@@ -160,6 +160,13 @@ mortgage = (loan * amortization + loan * interest) / 12   # per month</code></pr
           appears in the Inputs panel as a field anyone can change. Any other line is <strong>calculated</strong>, and
           its result shows next to it and in the Results panel. There is no run button; the whole document recalculates
           on every edit.
+        </p>
+        <p>
+          You don't have to name everything. A line that is only an expression, like <code>3 + 4</code> or
+          <code>loan * interest</code>, is calculated and shown as a result next to the line, like on a calculator. It
+          isn't stored, so other lines can't use it; give it a name if you need it. A line that starts with a name and
+          <code>=</code> is always an assignment, so to compare on a line of its own, put the comparison in
+          parentheses: <code>(a = b)</code>.
         </p>
         <p>
           Try the <strong>Examples</strong> menu in the header to open a ready-made document. Choosing one replaces what
