@@ -13,8 +13,8 @@
         location.replace(url.href);
       }
     </script>
-    <script type="module" crossorigin src="./assets/main-DuuyX9Yr.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/main-CNw-sUxf.css">
+    <script type="module" crossorigin src="./assets/main-C4BPb7c6.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/main-BqY1Tlae.css">
   </head>
   <body>
     <header>
@@ -26,18 +26,20 @@
           <button type="button" data-view="inputs-results" title="Inputs and results only, without the code">Inputs &amp; results</button>
           <button type="button" data-view="output" title="Results only, without the code or the inputs">Results</button>
         </div>
+        <button type="button" id="tutorial-start" title="Learn the language step by step">Tutorial</button>
         <select id="examples" aria-label="Open an example">
           <option value="">Examples…</option>
         </select>
         <a class="docs-link" href="docs.html">Docs</a>
       </div>
     </header>
+    <div id="tutorial-dock" hidden></div>
     <main data-view="code-results">
       <section id="editor" aria-label="Document"></section>
       <aside>
         <div class="pane" id="pane-inputs">
           <section aria-label="Inputs">
-            <p class="hint" id="inputs-hint">Write name = number and it shows up here as something to change.</p>
+            <p class="hint" id="inputs-hint">Inputs are lines that are just a value, like price = 100, rate = 5%, city = "Oslo", due = 2024-03-01 or a list or table. Each one gets a field here that anyone can change without touching the code.</p>
             <div id="inputs"></div>
           </section>
         </div>

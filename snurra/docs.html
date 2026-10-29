@@ -5,27 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>snurra docs</title>
     <style>
+      /* The app's palette: flat, square, white (or near-black), with the blue bar on top. */
       :root {
-        --bg: #f6f5f2;
-        --surface: #ffffff;
-        --text: #1f2328;
-        --muted: #6b7280;
-        --line: #e4e2dc;
-        --accent: #2f6f5e;
-        --err: #b42318;
-        --code-bg: #efede8;
+        --bg: #ffffff;
+        --text: #111111;
+        --muted: #555555;
+        --line: #cccccc;
+        --rule: #767676;
+        --panel: #f6f6f6;
+        --bar: #e4edf7;
+        --bar-line: #7f9cbf;
+        --bar-hi: #bcd3ee;
+        --accent: #111111;
+        --err: #b00020;
         --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
       }
       @media (prefers-color-scheme: dark) {
         :root {
-          --bg: #16181a;
-          --surface: #1e2124;
-          --text: #e6e6e3;
-          --muted: #8b9199;
-          --line: #2d3136;
-          --accent: #6fc2a8;
-          --err: #ff8b7e;
-          --code-bg: #25292d;
+          --bg: #121212;
+          --text: #dddddd;
+          --muted: #999999;
+          --line: #3a3a3a;
+          --rule: #7a7a7a;
+          --panel: #1a1a1a;
+          --bar: #1b2635;
+          --bar-line: #4d6a93;
+          --bar-hi: #33507a;
+          --accent: #ffffff;
+          --err: #ff8a80;
         }
       }
       * { box-sizing: border-box; }
@@ -35,66 +42,76 @@
         color: var(--text);
         font: 15px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
       }
-      a { color: var(--accent); }
+      a { color: var(--text); text-underline-offset: 2px; }
+      a:hover { background: var(--bar); }
       header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 14px 16px;
+        padding: 6px 12px;
+        background: var(--bar);
+        border-bottom: 1px solid var(--bar-line);
+        font: 13px/1.5 var(--mono);
       }
-      header h1 { margin: 0; font-size: 18px; letter-spacing: 0.02em; }
-      header h1 span { color: var(--muted); font-weight: 400; }
+      header h1 { margin: 0; font-size: 13px; font-weight: 700; }
+      header h1 span { font-weight: 400; color: var(--muted); }
       .layout {
         display: grid;
-        grid-template-columns: 200px minmax(0, 1fr);
-        gap: 32px;
-        max-width: 960px;
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 40px;
+        max-width: 1000px;
         margin: 0 auto;
-        padding: 0 16px 64px;
+        padding: 24px 16px 64px;
         align-items: start;
       }
-      nav { position: sticky; top: 16px; font-size: 14px; }
-      nav ul { list-style: none; margin: 0; padding: 0; }
-      nav li { margin: 4px 0; }
-      nav a { text-decoration: none; color: var(--muted); }
-      nav a:hover { color: var(--accent); }
+      nav { position: sticky; top: 16px; font: 13px/1.5 var(--mono); }
+      nav ul { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--line); }
+      nav li { margin: 0; }
+      nav a { display: block; padding: 2px 0 2px 12px; margin-left: -1px; border-left: 2px solid transparent; text-decoration: none; color: var(--muted); }
+      nav a:hover { color: var(--text); background: none; border-left-color: var(--bar-line); }
       @media (max-width: 760px) {
-        .layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
+        .layout { grid-template-columns: minmax(0, 1fr); gap: 0; padding-top: 12px; }
         nav { position: static; margin-bottom: 16px; }
-        nav ul { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+        nav ul { display: flex; flex-wrap: wrap; gap: 0 14px; border-left: 0; }
+        nav a { padding: 2px 0; border-left: 0; }
       }
-      article {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 8px 28px 28px;
-        min-width: 0;
+      article { min-width: 0; max-width: 46rem; }
+      h2 {
+        margin: 40px 0 8px;
+        padding-top: 8px;
+        border-top: 1px solid var(--rule);
+        font: 600 12px/1.5 var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        scroll-margin-top: 16px;
       }
-      h2 { margin: 36px 0 8px; font-size: 20px; scroll-margin-top: 16px; }
-      h3 { margin: 24px 0 4px; font-size: 15px; }
+      h2:first-of-type { margin-top: 24px; }
+      h3 { margin: 24px 0 4px; font: 700 13px/1.5 var(--mono); }
       p, ul, ol { margin: 8px 0; }
       li { margin: 2px 0; }
       code {
         font-family: var(--mono);
-        font-size: 0.9em;
-        background: var(--code-bg);
-        padding: 1px 5px;
-        border-radius: 4px;
+        font-size: 0.88em;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        padding: 0 4px;
       }
       pre {
         font-family: var(--mono);
         font-size: 13px;
-        line-height: 1.55;
-        background: var(--code-bg);
-        border-radius: 6px;
-        padding: 10px 14px;
+        line-height: 1.5;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--bar-line);
+        padding: 8px 12px;
         margin: 10px 0;
         overflow-x: auto;
       }
-      pre code { background: none; padding: 0; font-size: inherit; }
+      pre code { background: none; border: 0; padding: 0; font-size: inherit; }
       table { border-collapse: collapse; margin: 10px 0; font-size: 14px; display: block; overflow-x: auto; }
-      th, td { text-align: left; padding: 4px 14px 4px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
-      th { color: var(--muted); font-weight: 600; }
+      th, td { text-align: left; padding: 3px 16px 3px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { font-weight: 400; color: var(--muted); background: var(--panel); }
       .note { color: var(--muted); }
       .lead { font-size: 16px; color: var(--muted); }
     </style>
@@ -227,6 +244,7 @@ quarter = floor((month_of(due) + 2) / 3)</code></pre>
           <li>Month arithmetic keeps the day, or clamps to the end of a shorter month: 31 January plus 1 month is 29 February (2024).</li>
           <li>Functions: <code>year_of</code>, <code>month_of</code>, <code>day_of</code>, <code>weekday_of</code> (1 is Monday), <code>add_months(d, n)</code> and <code>month_start(d)</code>.</li>
           <li><code>month_start(d)</code> is the usual key for grouping by month. Such dates are shown as a month name and year.</li>
+          <li><code>weekday_of(d)</code> is shown as a day name (Mon, Tue, …) but is still the number 1 to 7. Adding or subtracting whole days keeps it a weekday while it stays between 1 and 7: Friday + 1 is Saturday, but Sunday + 1 is a plain 8. Multiplying and dividing give plain numbers.</li>
           <li>A date never equals text: <code>d = "2024-01-01"</code> is an error. Write it without quotes.</li>
           <li>Impossible dates (<code>2023-02-29</code>) are errors, never rolled over to the next month. <code>2024 - 03 - 01</code> with spaces is subtraction.</li>
         </ul>
@@ -411,12 +429,14 @@ big = utgifter where belopp > 300 sort belopp, vem</code></pre>
 rate = 5%
 deposit = 1_000
 
-growth = year 0..30
-  balance = if(row = 1, start, prev * (1 + rate) + deposit)
-  interest = if(row = 1, 0, balance - prev.balance)
+growth = year 1..30
+  balance = if(row = 1, start, prev) * (1 + rate) + deposit
+  interest = if(row = 1, balance - start, balance - prev.balance)
 
 final = last(growth.balance)</code></pre>
         <p>
+          Each row here is the balance at the end of that year, so the first one already has a year of interest and a
+          deposit in it.
           <code>prev</code> is this column in the previous row, <code>prev.name</code> any column of the previous row.
           Reaching before the first row is an error, which is why the first row is written out with <code>if(row = 1, …)</code>.
           <code>prev_or(x)</code> is shorthand for <code>if(row = 1, x, prev)</code>, so the balance above can be
@@ -468,6 +488,7 @@ total = brutto * 2</code></pre>
           <li><strong>Code</strong> shows the editor alone, with results beside each line, and calculated tables drawn as grids under their statements. <strong>Code &amp; results</strong> adds the Inputs and Results panels. <strong>Inputs &amp; results</strong> hides the code and leaves only the inputs and results: that's the view for someone who just wants to use the document. <strong>Results</strong> shows only the results, with no code and no inputs, for someone who only cares about the answers.</li>
           <li>Writing <code>name = number</code> adds a field to the Inputs panel. Hovering a field or its line links the two.</li>
           <li>Your document is saved in your browser as you type.</li>
+          <li>The <strong>Tutorial</strong> button in the header teaches the language step by step, in a document of its own. A bubble gives you something to do; when you have done it, press <strong>Next step</strong>: the lines so far lock and the next task appears below. Your own document comes back when you leave.</li>
           <li>Autocomplete offers your names and the functions, and a table's columns after <code>table.</code>.</li>
         </ul>
       </article>
