@@ -190,7 +190,7 @@ mortgage = (loan * amortization + loan * interest) / 12   # per month</code></pr
           <tr><td><code>first</code>, <code>last</code></td><td>First or last filled value of a column</td></tr>
           <tr><td><code>abs</code>, <code>floor</code>, <code>ceil</code></td><td>Absolute value; whole number below or above</td></tr>
           <tr><td><code>round(x)</code>, <code>round(x, n)</code></td><td>Rounds half away from zero, optionally to <code>n</code> decimals</td></tr>
-          <tr><td><code>iff(cond, a, b)</code></td><td><code>a</code> if the condition holds, otherwise <code>b</code></td></tr>
+          <tr><td><code>if(cond, a, b)</code></td><td><code>a</code> if the condition holds, otherwise <code>b</code></td></tr>
         </table>
         <p>
           Function names are case-insensitive. <code>sum(5)</code> is an error: with one argument, the aggregate functions
@@ -206,10 +206,10 @@ mortgage = (loan * amortization + loan * interest) / 12   # per month</code></pr
         <pre data-snurra><code>income = 42_000
 loan = 600_000
 ok = income * 5 > loan and not (loan = 0)
-fee = iff(ok, 0, 500)</code></pre>
+fee = if(ok, 0, 500)</code></pre>
         <p>
-          <code>iff</code>, <code>and</code> and <code>or</code> only evaluate what they need, so
-          <code>iff(x = 0, 0, 1 / x)</code> is safe when <code>x</code> is 0.
+          <code>if</code>, <code>and</code> and <code>or</code> only evaluate what they need, so
+          <code>if(x = 0, 0, 1 / x)</code> is safe when <code>x</code> is 0.
         </p>
 
         <h2 id="dates">Dates</h2>
@@ -220,7 +220,7 @@ fee = iff(ok, 0, 500)</code></pre>
         <pre data-snurra><code>today = 2024-03-15
 invoice_date = 2024-02-20
 due = invoice_date + 30 days
-days_late = iff(today > due, today - due, 0)
+days_late = if(today > due, today - due, 0)
 quarter = floor((month_of(due) + 2) / 3)</code></pre>
         <ul>
           <li><code>date - date</code> is a number of days; <code>date + 30</code> and <code>date + 1 month</code> are dates.</li>
@@ -323,7 +323,7 @@ andel = utgifter with
           Because <code>with</code> works one row at a time, a total over the same table has to be a line of its own, as
           <code>total</code> is above. <code>row</code> is the row number, <code>prev</code> the value on the row before,
           and <code>prev(n)</code> goes back <code>n</code> rows, which gives running totals:
-          <code>balance = iff(row = 1, amount, prev + amount)</code>.
+          <code>balance = if(row = 1, amount, prev + amount)</code>.
         </p>
 
         <h2 id="groups">Grouping: by</h2>
@@ -412,13 +412,16 @@ rate = 5%
 deposit = 1_000
 
 growth = year 0..30
-  balance = iff(row = 1, start, prev * (1 + rate) + deposit)
-  interest = iff(row = 1, 0, balance - prev.balance)
+  balance = if(row = 1, start, prev * (1 + rate) + deposit)
+  interest = if(row = 1, 0, balance - prev.balance)
 
 final = last(growth.balance)</code></pre>
         <p>
           <code>prev</code> is this column in the previous row, <code>prev.name</code> any column of the previous row.
-          Reaching before the first row is an error, which is why the first row is written out with <code>iff(row = 1, …)</code>.
+          Reaching before the first row is an error, which is why the first row is written out with <code>if(row = 1, …)</code>.
+          <code>prev_or(x)</code> is shorthand for <code>if(row = 1, x, prev)</code>, so the balance above can be
+          <code>prev_or(start) * (1 + rate) + deposit</code>. <code>prev_or(x, n)</code> is
+          <code>if(row &gt; n, prev(n), x)</code>: <code>x</code> in the first <code>n</code> rows, then the value <code>n</code> rows back.
           Series have at most 10,000 rows, and the result is an ordinary table.
         </p>
 
@@ -465,7 +468,7 @@ total = brutto * 2</code></pre>
           <li><strong>Code</strong> shows the editor alone, with results beside each line, and calculated tables drawn as grids under their statements. <strong>Code &amp; results</strong> adds the Inputs and Results panels. <strong>Inputs &amp; results</strong> hides the code and leaves only the inputs and results: that's the view for someone who just wants to use the document. <strong>Results</strong> shows only the results, with no code and no inputs, for someone who only cares about the answers.</li>
           <li>Writing <code>name = number</code> adds a field to the Inputs panel. Hovering a field or its line links the two.</li>
           <li>Your document is saved in your browser as you type.</li>
-          <li>Autocomplete offers your names and the functions.</li>
+          <li>Autocomplete offers your names and the functions, and a table's columns after <code>table.</code>.</li>
         </ul>
       </article>
     </div>

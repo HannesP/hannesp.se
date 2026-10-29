@@ -4,8 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>snurra</title>
-    <script type="module" crossorigin src="/snurra/assets/main-CrWYQAsu.js"></script>
-    <link rel="stylesheet" crossorigin href="/snurra/assets/main-C41ZJU2r.css">
+    <script>
+      // Temporary: the public deployment lives under /snurra/ and needs the trailing slash.
+      // The query string and hash are kept.
+      var url = new URL(location.href);
+      if (url.origin === "https://hannesp.se" && url.pathname === "/snurra") {
+        url.pathname = "/snurra/";
+        location.replace(url.href);
+      }
+    </script>
   </head>
   <body>
     <header>
@@ -47,5 +54,6 @@
         </div>
       </aside>
     </main>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
