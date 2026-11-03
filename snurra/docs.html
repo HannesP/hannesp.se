@@ -138,6 +138,7 @@
           <li><a href="#paste">Pasting data</a></li>
           <li><a href="#hidden">Hiding lines</a></li>
           <li><a href="#options">Offering choices</a></li>
+          <li><a href="#charts">Charts</a></li>
           <li><a href="#errors">Errors</a></li>
           <li><a href="#views">The editor</a></li>
         </ul>
@@ -215,6 +216,7 @@ mortgage = (loan * amortization + loan * interest) / 12   # per month</code></pr
           <tr><td><code>first</code>, <code>last</code></td><td>First or last filled value of a column</td></tr>
           <tr><td><code>abs</code>, <code>floor</code>, <code>ceil</code></td><td>Absolute value; whole number below or above</td></tr>
           <tr><td><code>round(x)</code>, <code>round(x, n)</code></td><td>Rounds half away from zero, optionally to <code>n</code> decimals</td></tr>
+          <tr><td><code>mod(m, n)</code></td><td>The remainder of <code>m</code> divided by <code>n</code>; it has the sign of <code>n</code>, so <code>mod(-1, 7)</code> is 6</td></tr>
           <tr><td><code>if(cond, a, b)</code></td><td><code>a</code> if the condition holds, otherwise <code>b</code></td></tr>
         </table>
         <p>
@@ -494,6 +496,41 @@ cost = price * interest</code></pre>
           a button swaps it with the value on the line, so the list is always the other values. The options are plain values of the
           same kind as the input, and the hint only goes on an input that is a single value (not a list or a table). The
           buttons are in the Inputs panel; Results view shows only the answers, so it has none.
+        </p>
+
+        <h2 id="charts">Charts</h2>
+        <p>
+          Put <code>@chart line</code> or <code>@chart bar</code> on a line that makes a table, and the table is drawn as a
+          chart above its grid. The first column is the x axis; every other column of numbers is a line or a set of bars.
+        </p>
+        <pre data-snurra><code>start = 10_000
+rate = 5%
+deposit = 1_000
+
+growth = year 0..30  @chart line
+  balance = if(row = 1, start, prev * (1 + rate) + deposit)</code></pre>
+        <p>
+          <code>@chart bar</code> suits categories, such as the groups of a <code>by</code>. The hint goes on the line
+          that makes the table, and covers the lines indented below it.
+        </p>
+        <pre data-snurra><code>expenses = table
+  dept, amount
+  Sales, 1200
+  Ops, 800
+  Sales, 300
+
+per_dept = expenses by dept  @chart bar
+  total = sum(amount)</code></pre>
+        <p>
+          There are no chart settings. The axis always starts at zero, a blank cell is a gap and never a zero, and a column
+          marked <code>@hidden</code> is left out. Columns on very different scales share one axis, so hide the small one or
+          chart a <code>table of</code> with just the columns to compare.
+        </p>
+        <p>
+          Like every hint, <code>@chart</code> never changes what a line means: the table has the same values with or
+          without it. It is an error on anything that isn't a table, inside a block, or when no column besides the first
+          holds numbers, and the message says so. Hovering a point or a bar shows its value. The table under a chart starts
+          closed, with its size shown; click its arrow to see every number, and your choice is remembered.
         </p>
 
         <h2 id="errors">Errors</h2>
