@@ -137,6 +137,7 @@
           <li><a href="#series">Series</a></li>
           <li><a href="#paste">Pasting data</a></li>
           <li><a href="#hidden">Hiding lines</a></li>
+          <li><a href="#options">Offering choices</a></li>
           <li><a href="#errors">Errors</a></li>
           <li><a href="#views">The editor</a></li>
         </ul>
@@ -477,6 +478,22 @@ total = brutto * 2</code></pre>
         <p>
           A hint never changes what a line means. An error is never hidden. The editor shows hidden values dimmed behind
           a "Show N hidden" switch, and a reader is told that something is hidden.
+        </p>
+
+        <h2 id="options">Offering choices</h2>
+        <p>
+          Put <code>@options</code> and some more values at the end of an input to let the reader try them with one
+          click. The values are shown as buttons instead of a field, and clicking one rewrites the value in the line.
+        </p>
+        <pre data-snurra><code>interest = 3%          @options 2%, 4%
+price = 4_000_000      @options 5_000_000
+cost = price * interest</code></pre>
+        <p>
+          The value on the line is one of the choices, so the options don't repeat it. The buttons are in order: numbers
+          by size, dates and durations by time, true before false, and text alphabetically (capitals don't matter). Picking
+          a button swaps it with the value on the line, so the list is always the other values. The options are plain values of the
+          same kind as the input, and the hint only goes on an input that is a single value (not a list or a table). The
+          buttons are in the Inputs panel; Results view shows only the answers, so it has none.
         </p>
 
         <h2 id="errors">Errors</h2>
