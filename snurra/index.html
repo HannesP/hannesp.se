@@ -13,8 +13,8 @@
         location.replace(url.href);
       }
     </script>
-    <script type="module" crossorigin src="./assets/main-DpFiBDTe.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/main-2lMNswCr.css">
+    <script type="module" crossorigin src="./assets/main-CdwV6eOo.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/main-Ci2Z0nD9.css">
   </head>
   <body>
     <header>
@@ -28,11 +28,21 @@
           <button type="button" data-view="output" title="Results only, without the code or the inputs">Results</button>
         </div>
         <button type="button" id="share" title="Copy a link that holds this whole document">Share</button>
-        <button type="button" id="tutorial-start" title="Learn the language step by step">Tutorial</button>
-        <select id="examples" aria-label="Open an example">
-          <option value="">Examples…</option>
-        </select>
-        <a class="docs-link" href="docs.html">Docs</a>
+        <div class="menu">
+          <button type="button" class="menu-button" aria-haspopup="true" aria-expanded="false">Settings</button>
+          <div class="menu-popup" role="group" aria-label="Settings" hidden>
+            <label class="menu-item"><input type="checkbox" id="line-numbers" /> Show line numbers</label>
+          </div>
+        </div>
+        <div class="menu">
+          <button type="button" class="menu-button" aria-haspopup="true" aria-expanded="false">Help</button>
+          <div class="menu-popup" role="group" aria-label="Help" hidden>
+            <button type="button" class="menu-item" id="tutorial-start" title="Learn the language step by step">Tutorial</button>
+            <a class="menu-item" href="docs.html">Documentation</a>
+            <button type="button" class="menu-item submenu-button" id="examples-button" aria-haspopup="true" aria-expanded="false">Examples</button>
+            <div class="submenu-list" id="examples-list" role="group" aria-label="Examples" hidden></div>
+          </div>
+        </div>
       </div>
     </header>
     <main data-view="code-results">
@@ -59,5 +69,23 @@
         </div>
       </aside>
     </main>
+    <script>
+      // Before the first paint: the module below runs later, and until then the page would show the default view
+      // and no line numbers, then jump to the saved ones. Mirrors what main.ts does (see setViewMode and setLineNumbers).
+      (function () {
+        try {
+          var modes = ["code", "code-results", "inputs-results", "output"];
+          var legacy = { split: "code-results", calculator: "inputs-results", results: "inputs-results" };
+          var fromHash = /^#view=([a-z-]+)$/.exec(location.hash);
+          var saved = localStorage.getItem("snurra:view");
+          var mode = (fromHash && modes.indexOf(fromHash[1]) >= 0 && fromHash[1]) || legacy[saved] || (modes.indexOf(saved) >= 0 && saved) || "code-results";
+          document.querySelector("main").dataset.view = mode;
+          document.querySelectorAll(".views button").forEach(function (b) {
+            b.setAttribute("aria-pressed", String(b.dataset.view === mode));
+          });
+          if (localStorage.getItem("snurra:line-numbers") === "1") document.querySelector("main").classList.add("line-numbers");
+        } catch (e) {}
+      })();
+    </script>
   </body>
 </html>

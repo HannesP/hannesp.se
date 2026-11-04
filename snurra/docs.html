@@ -171,8 +171,12 @@ mortgage = (loan * amortization + loan * interest) / 12   # per month</code></pr
           parentheses: <code>(a = b)</code>.
         </p>
         <p>
-          Try the <strong>Examples</strong> menu in the header to open a ready-made document. Choosing one replaces what
+          Try <strong>Help → Examples</strong> in the header to open a ready-made document. Choosing one replaces what
           you have, and undo (Ctrl or Cmd+Z) brings it back.
+        </p>
+        <p>
+          Line numbers are hidden, since an error is marked in red and the problem list takes you to it. Turn them on
+          under <strong>Settings</strong> in the header.
         </p>
 
         <h2 id="values">Values and names</h2>
@@ -291,18 +295,24 @@ total = sum(weights)</code></pre>
           <li><code>table of weights, bmi</code> builds a table from lists of the same length.</li>
         </ul>
         <p>
-          A table with many columns can be narrowed to the ones worth showing: name them after <code>table of</code>.
-          The columns come out in the order you write them, so this also reorders.
+          A table with many columns can be narrowed to the ones worth showing: <code>keep</code> names the columns to
+          keep, and <code>drop</code> names the ones to leave out (use one or the other, not both).
+          <code>keep</code> gives the columns in the order you write them, so it also reorders, and
+          <code>as</code> renames a column.
         </p>
         <pre data-snurra><code>wide = table
   dept,  limit, owner, phone,    level
   Sales, 50000, Anna,  555-0101, 2
   Ops,   30000, Bo,    555-0102, 3
 
-overview = table of wide.dept, wide.limit</code></pre>
+overview = wide keep dept, limit
+no_contact = wide drop owner, phone
+renamed = wide keep dept as team, limit as cap</code></pre>
         <p>
-          To narrow a sorted or filtered table, give that table a name first and pick from it:
-          <code>top = wide sort limit desc limit 1</code>, then <code>table of top.dept, top.limit</code>.
+          <code>keep</code> and <code>drop</code> go in a chain after <code>where</code> and <code>with</code> and before
+          <code>sort</code> and <code>limit</code>, so the sort sees only the columns that are left:
+          <code>top = wide keep dept, limit sort limit desc limit 1</code>.
+          Use <code>table of</code> to build a table from lists, which <code>keep</code> cannot do.
         </p>
 
         <h2 id="filter">Filtering and lookups</h2>
@@ -524,7 +534,7 @@ per_dept = expenses by dept  @chart bar
         <p>
           There are no chart settings. The axis always starts at zero, a blank cell is a gap and never a zero, and a column
           marked <code>@hidden</code> is left out. Columns on very different scales share one axis, so hide the small one or
-          chart a <code>table of</code> with just the columns to compare.
+          chart a <code>keep</code> with just the columns to compare.
         </p>
         <p>
           Like every hint, <code>@chart</code> never changes what a line means: the table has the same values with or
