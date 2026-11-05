@@ -333,12 +333,19 @@ expenses = table
 
 big = expenses where amount > 500
 ops_limit = lookup budget.limit where budget.dept = "Ops"
+travel_limit = lookup budget.limit where budget.dept = "Travel" otherwise 0
 b = lookup budget where budget.dept = "Sales"
 sales_owner = b.owner
 n_big = count(expenses.amount where expenses.amount > 500)</code></pre>
         <ul>
           <li>A <code>where</code> runs to the end of the line. Parenthesise it to use it inside a bigger expression.</li>
           <li>No match, or more than one, is an error that says which value was missing or ambiguous. Matching is exact.</li>
+          <li>
+            Add <code>otherwise</code> to a single-value lookup for a fallback when nothing matches:
+            <code>lookup budget.limit where budget.dept = "Travel" otherwise 0</code>. Several matches, or an error in
+            the condition, are still errors. The fallback is taken as written (<code>0</code> is a plain number,
+            <code>0%</code> a percent), and it is not available when looking up a whole row.
+          </li>
           <li>If a bare name could mean a column of two tables, or a column and one of your own names, you get an error that lists the candidates. Write <code>table.column</code> to be explicit.</li>
         </ul>
 
