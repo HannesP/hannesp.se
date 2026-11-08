@@ -13,8 +13,8 @@
         location.replace(url.href);
       }
     </script>
-    <script type="module" crossorigin src="./assets/main-vKdLvHzU.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/main-BLD1Epzc.css">
+    <script type="module" crossorigin src="./assets/main-N-ZuACsg.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/main-ChOHP_OA.css">
   </head>
   <body>
     <header>
@@ -37,7 +37,8 @@
         <div class="menu">
           <button type="button" class="menu-button" aria-haspopup="true" aria-expanded="false">Help</button>
           <div class="menu-popup" role="group" aria-label="Help" hidden>
-            <button type="button" class="menu-item" id="tutorial-start" title="Learn the language step by step">Tutorial</button>
+            <button type="button" class="menu-item submenu-button" id="tutorial-start" aria-haspopup="true" aria-expanded="false" title="Learn the language, one chapter at a time">Tutorial</button>
+            <div class="submenu-list" id="tutorial-list" role="group" aria-label="Tutorial chapters" hidden></div>
             <a class="menu-item" href="docs.html">Documentation</a>
             <button type="button" class="menu-item submenu-button" id="examples-button" aria-haspopup="true" aria-expanded="false">Examples</button>
             <div class="submenu-list" id="examples-list" role="group" aria-label="Examples" hidden></div>
@@ -48,17 +49,22 @@
     <main data-view="code-results">
       <section id="editor" aria-label="Document"></section>
       <aside>
+        <div id="sheet-tabs" role="tablist" aria-label="Sheets" hidden></div>
         <div class="pane" id="pane-inputs">
           <section aria-label="Inputs">
             <p class="hint" id="inputs-hint">Inputs are lines that are just a value, like price = 100, rate = 5%, city = "Oslo", due = 2024-03-01 or a list or table. Each one gets a field here that anyone can change without touching the code.</p>
+            <label class="hidden-toggle" id="hidden-toggle-inputs" hidden>
+              <input type="checkbox" id="show-hidden-inputs" />
+              <span id="hidden-count-inputs"></span>
+            </label>
             <div id="inputs"></div>
           </section>
         </div>
         <div class="pane" id="pane-outputs">
           <section aria-label="Results">
-            <label class="hidden-toggle" id="hidden-toggle" hidden>
-              <input type="checkbox" id="show-hidden" />
-              <span id="hidden-count"></span>
+            <label class="hidden-toggle" id="hidden-toggle-results" hidden>
+              <input type="checkbox" id="show-hidden-results" />
+              <span id="hidden-count-results"></span>
             </label>
             <div id="results"></div>
           </section>
@@ -76,7 +82,7 @@
         try {
           var modes = ["code", "code-results", "inputs-results", "output"];
           var legacy = { split: "code-results", calculator: "inputs-results", results: "inputs-results" };
-          var fromHash = /^#view=([a-z-]+)$/.exec(location.hash);
+          var fromHash = /^#view=([a-z-]+)(?:&sheet=.*)?$/.exec(location.hash);
           var saved = localStorage.getItem("snurra:view");
           var mode = (fromHash && modes.indexOf(fromHash[1]) >= 0 && fromHash[1]) || legacy[saved] || (modes.indexOf(saved) >= 0 && saved) || "code-results";
           document.querySelector("main").dataset.view = mode;

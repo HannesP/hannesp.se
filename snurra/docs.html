@@ -139,6 +139,7 @@
           <li><a href="#hidden">Hiding lines</a></li>
           <li><a href="#options">Offering choices</a></li>
           <li><a href="#charts">Charts</a></li>
+          <li><a href="#sheets">Sheets</a></li>
           <li><a href="#errors">Errors</a></li>
           <li><a href="#views">The editor</a></li>
         </ul>
@@ -220,6 +221,7 @@ mortgage = (loan * amortization + loan * interest) / 12   # per month</code></pr
           <tr><td><code>first</code>, <code>last</code></td><td>First or last filled value of a column</td></tr>
           <tr><td><code>abs</code>, <code>floor</code>, <code>ceil</code></td><td>Absolute value; whole number below or above</td></tr>
           <tr><td><code>round(x)</code>, <code>round(x, n)</code></td><td>Rounds half away from zero, optionally to <code>n</code> decimals</td></tr>
+          <tr><td><code>replace_blank(x, y)</code></td><td><code>x</code>, or <code>y</code> where <code>x</code> is blank (not for <code>0</code> or an error). Use it before adding up a column that <code>complete</code> left blanks in</td></tr>
           <tr><td><code>mod(m, n)</code></td><td>The remainder of <code>m</code> divided by <code>n</code>; it has the sign of <code>n</code>, so <code>mod(-1, 7)</code> is 6</td></tr>
           <tr><td><code>if(cond, a, b)</code></td><td><code>a</code> if the condition holds, otherwise <code>b</code></td></tr>
         </table>
@@ -314,6 +316,17 @@ renamed = wide keep dept as team, limit as cap</code></pre>
           <code>top = wide keep dept, limit sort limit desc limit 1</code>.
           Use <code>table of</code> to build a table from lists, which <code>keep</code> cannot do.
         </p>
+        <p>
+          A table with a date (or month, or whole number) column that has gaps can be given a row for every step with
+          <code>complete</code>: <code>daily = sales complete</code>. The first column is the index (it is also the x axis of a chart), so
+          use <code>keep</code> to put another column first. The new rows are blank in the other columns,
+          so a chart of it has an even x axis. Each value of the column must appear only once.
+        </p>
+        <p>
+          A <code>by</code> with indented lines below it can be followed by more steps on the same line:
+          <code>fig = expenses by date across descr complete</code>, then the <code>total = sum(amount)</code> line
+          below. The lines belong to the <code>by</code>, and the steps after it see the finished table.
+        </p>
 
         <h2 id="filter">Filtering and lookups</h2>
         <p>
@@ -354,15 +367,15 @@ n_big = count(expenses.amount where expenses.amount > 500)</code></pre>
           <code>with</code> adds calculated columns to a table and keeps every row, in the same order. Inside it, column
           names mean "this row's value".
         </p>
-        <pre data-snurra><code>utgifter = table
-  dept, belopp
+        <pre data-snurra><code>expenses = table
+  dept, amount
   Sales, 1200
   Ops, 400
   Sales, 800
 
-total = sum(utgifter.belopp)
-andel = utgifter with
-  share = belopp / total
+total = sum(expenses.amount)
+shares = expenses with
+  share = amount / total
   pct = round(share * 100, 1)</code></pre>
         <p>
           Because <code>with</code> works one row at a time, a total over the same table has to be a line of its own, as
@@ -550,6 +563,25 @@ per_dept = expenses by dept  @chart bar
           closed, with its size shown; click its arrow to see every number, and your choice is remembered.
         </p>
 
+        <h2 id="sheets">Sheets</h2>
+        <p>
+          A long document can be split into sheets. Put <code>@sheet</code> on a line of its own, with a name if you like,
+          and everything below it, up to the next <code>@sheet</code>, belongs to that sheet:
+        </p>
+        <pre data-snurra><code>@sheet Budget
+income = 5000
+rent = 1500
+
+@sheet Summary
+left = income - rent</code></pre>
+        <p>
+          With two sheets or more, the inputs and results show a tab for each, and only the open sheet's lines. The code
+          still shows everything. Sheets don't separate names: <code>income</code> can be used on any sheet, so a summary
+          sheet can pull from the others. Lines before the first <code>@sheet</code> form a sheet of their own, an
+          unnamed sheet is called "Sheet 2" and so on, and repeating a name carries on that sheet. A problem on any sheet
+          shows in the problems badge at the top, and clicking it opens the sheet it is on.
+        </p>
+
         <h2 id="errors">Errors</h2>
         <p>
           A mistake on one line is shown on that line, in plain language, and never stops the rest of the document. Lines
@@ -566,7 +598,7 @@ per_dept = expenses by dept  @chart bar
           <li><strong>Code</strong> shows the editor alone, with results beside each line, and calculated tables drawn as grids under their statements. <strong>Code &amp; results</strong> adds the Inputs and Results panels. <strong>Inputs &amp; results</strong> hides the code and leaves only the inputs and results: that's the view for someone who just wants to use the document. <strong>Results</strong> shows only the results, with no code and no inputs, for someone who only cares about the answers.</li>
           <li>Writing <code>name = number</code> adds a field to the Inputs panel. Hovering a field or its line links the two.</li>
           <li>Your document is saved in your browser as you type.</li>
-          <li>The <strong>Tutorial</strong> button in the header teaches the language step by step, in a document of its own. A bubble gives you something to do; when you have done it, press <strong>Next step</strong>: the lines so far lock and the next task appears below. Your own document comes back when you leave.</li>
+          <li>The <strong>Tutorial</strong> item in the Help menu opens a list of chapters; pick one to start. It teaches the language in five short chapters, each in a document of its own. A bubble gives you something to do; when you have done it, press <strong>Next step</strong>: the lines so far lock and the next task appears below. A chapter ends by inviting you to the next, which starts afresh (some start with a few lines already written). Your own document comes back when you leave.</li>
           <li>Autocomplete offers your names and the functions, and a table's columns after <code>table.</code>.</li>
         </ul>
       </article>
