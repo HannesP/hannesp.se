@@ -185,7 +185,7 @@ mortgage = (loan * amortization + loan * interest) / 12   # per month</code></pr
         <table>
           <tr><th>Kind</th><th>Written</th><th>Notes</th></tr>
           <tr><td>Number</td><td><code>1250.50</code>, <code>8_000_000</code>, <code>3%</code></td><td><code>.</code> is always the decimal point; <code>_</code> is for readability; <code>3%</code> means 0.03</td></tr>
-          <tr><td>Text</td><td><code>"Sales"</code></td><td>Compared without regard to case</td></tr>
+          <tr><td>Text</td><td><code>"Sales"</code></td><td>Compared exactly: <code>"Sales"</code> is not <code>"sales"</code></td></tr>
           <tr><td>True/false</td><td><code>true</code>, <code>false</code></td><td></td></tr>
           <tr><td>Date</td><td><code>2024-03-01</code></td><td>Always year-month-day</td></tr>
           <tr><td>Duration</td><td><code>30 days</code>, <code>1 month</code></td><td>Needs a space between number and unit</td></tr>
@@ -209,6 +209,23 @@ mortgage = (loan * amortization + loan * interest) / 12   # per month</code></pr
 
         <h2 id="math">Operators and functions</h2>
         <p>
+          An expression can go on over several lines: a <code>(</code> that is not closed on its line goes on below
+          it, on lines indented more, until it is closed. A comment may end any line, and a hint
+          (<code>@hidden</code>) goes at the end of the last one.
+        </p>
+        <pre data-snurra><code>weight = 3
+
+shipping = if(
+    weight &lt; 1, 20,    # small parcel
+    weight &lt; 5, 45,
+    90
+  )</code></pre>
+        <p>
+          The closing bracket may be in the column of the statement, but every other line has to be indented, and a
+          blank line ends an unfinished expression: that is what keeps a forgotten <code>)</code> from taking the next
+          statement with it. The error says which bracket was left open.
+        </p>
+        <p>
           <code>+ - * /</code>, <code>^</code> for power, and parentheses. Precedence is the usual one, and
           <code>-2^2</code> is −4. There is no <code>%</code> operator: <code>3%</code> is just the number 0.03, so
           <code>100 + 20%</code> is 100.2, not 120. For 20 percent more, write <code>100 * (1 + 20%)</code>.
@@ -221,9 +238,14 @@ mortgage = (loan * amortization + loan * interest) / 12   # per month</code></pr
           <tr><td><code>first</code>, <code>last</code></td><td>First or last filled value of a column</td></tr>
           <tr><td><code>abs</code>, <code>floor</code>, <code>ceil</code></td><td>Absolute value; whole number below or above</td></tr>
           <tr><td><code>round(x)</code>, <code>round(x, n)</code></td><td>Rounds half away from zero, optionally to <code>n</code> decimals</td></tr>
+          <tr><td><code>concat(a, b, ...)</code>, <code>to_text(x, n)</code></td><td>Write values one after the other as text (<code>concat(done, "/", total, " items")</code>); numbers read like the results (2 decimals) and <code>to_text(x, n)</code> gives exactly <code>n</code></td></tr>
+          <tr><td><code>part(t, from, n)</code>, <code>split(t, sep, n)</code></td><td>Cut text: <code>n</code> characters from character <code>from</code> (negative counts from the end), or piece <code>n</code> between separators</td></tr>
+          <tr><td><code>contains(t, x)</code>, <code>replace(t, old, new)</code></td><td>Exact, like <code>=</code>: <code>"Coffee"</code> does not contain <code>"coffee"</code>. Fold the case first with <code>lower</code> to ignore it</td></tr>
+          <tr><td><code>trim(t)</code>, <code>upper(t)</code>, <code>lower(t)</code></td><td>Clean up text or change its case</td></tr>
+          <tr><td><code>to_number(t)</code>, <code>to_date(t)</code></td><td>Read text as a number (<code>1_234.5</code>, <code>12%</code>) or a date (<code>2026-03-14</code>)</td></tr>
           <tr><td><code>replace_blank(x, y)</code></td><td><code>x</code>, or <code>y</code> where <code>x</code> is blank (not for <code>0</code> or an error). Use it before adding up a column that <code>complete</code> left blanks in</td></tr>
           <tr><td><code>mod(m, n)</code></td><td>The remainder of <code>m</code> divided by <code>n</code>; it has the sign of <code>n</code>, so <code>mod(-1, 7)</code> is 6</td></tr>
-          <tr><td><code>if(cond, a, b)</code></td><td><code>a</code> if the condition holds, otherwise <code>b</code></td></tr>
+          <tr><td><code>if(cond, a, b)</code></td><td><code>a</code> if the condition holds, otherwise <code>b</code>. With more cases: <code>if(cond1, a, cond2, b, otherwise)</code>, the first one that holds</td></tr>
         </table>
         <p>
           Function names are case-insensitive. <code>sum(5)</code> is an error: with one argument, the aggregate functions
@@ -311,9 +333,11 @@ overview = wide keep dept, limit
 no_contact = wide drop owner, phone
 renamed = wide keep dept as team, limit as cap</code></pre>
         <p>
-          <code>keep</code> and <code>drop</code> go in a chain after <code>where</code> and <code>with</code> and before
-          <code>sort</code> and <code>limit</code>, so the sort sees only the columns that are left:
-          <code>top = wide keep dept, limit sort limit desc limit 1</code>.
+          <code>keep</code> and <code>drop</code> go in a chain after <code>where</code> and <code>with</code>. Before
+          <code>sort</code> and <code>limit</code> the sort sees only the columns that are left:
+          <code>top = wide keep dept, limit sort limit desc limit 1</code>. After them, once, they only choose what is
+          shown, so a column that was needed for the order can go:
+          <code>top = wide sort limit desc limit 1 keep dept</code>.
           Use <code>table of</code> to build a table from lists, which <code>keep</code> cannot do.
         </p>
         <p>
@@ -323,9 +347,24 @@ renamed = wide keep dept as team, limit as cap</code></pre>
           so a chart of it has an even x axis. Each value of the column must appear only once.
         </p>
         <p>
-          A <code>by</code> with indented lines below it can be followed by more steps on the same line:
-          <code>fig = expenses by date across descr complete</code>, then the <code>total = sum(amount)</code> line
-          below. The lines belong to the <code>by</code>, and the steps after it see the finished table.
+          A column whose name starts with <code>_</code> and a letter is a <strong>private</strong> step of the
+          calculation: <code>_num_done = count(...)</code>, then <code>progress = concat(_num_done, "/", _num_total)</code>.
+          The columns after it can read it, but it is not a column of the table, so tables made from it never carry it.
+          The editor still shows it (dimmed, under "Show hidden") so you can check the step. Use <code>@hidden</code>
+          instead for data that must stay in the table but out of sight.
+        </p>
+        <p>
+          The steps of a chain can go on the lines below the statement, one on each line, indented. The lines are joined,
+          so this means the same as writing them all on one line: <code>top = expenses</code>, then
+          <code>  sort amount desc</code> and <code>  limit 2 per month_start(date)</code> on the next lines.
+          A line counts as a step if it starts with <code>where</code>, <code>by</code>, <code>with</code>, <code>keep</code>,
+          <code>drop</code>, <code>complete</code>, <code>rank</code>, <code>sort</code> or <code>limit</code> and is not
+          a name being defined (<code>limit = 5</code> is a column). A blank line ends the steps.
+        </p>
+        <p>
+          A <code>by</code> is a step like the others: the <code>with</code> right after it says what each group gives,
+          and the steps after that see the finished table, as in <code>fig = expenses by date across descr with total =
+          sum(amount) complete</code>.
         </p>
 
         <h2 id="filter">Filtering and lookups</h2>
@@ -364,9 +403,14 @@ n_big = count(expenses.amount where expenses.amount > 500)</code></pre>
 
         <h2 id="columns">New columns: with</h2>
         <p>
-          <code>with</code> adds calculated columns to a table and keeps every row, in the same order. Inside it, column
-          names mean "this row's value".
+          <code>with name = expression</code> adds a calculated column to a table and keeps every row, in the same order.
+          Inside it, column names mean "this row's value". For several columns, separate them with commas
+          (<code>with half = a / 2, double = a * 2</code>) or put each <code>with</code> on a line of its own below the
+          table; a later column can use the ones added before it. The same lines can sit at the end of a table's own rows,
+          after the last row: <code>with total = a + b</code>. Those columns are worked out, not typed, and <code>with</code> is the
+          only step that goes there.
         </p>
+
         <pre data-snurra><code>expenses = table
   dept, amount
   Sales, 1200
@@ -374,21 +418,46 @@ n_big = count(expenses.amount where expenses.amount > 500)</code></pre>
   Sales, 800
 
 total = sum(expenses.amount)
-shares = expenses with
-  share = amount / total
-  pct = round(share * 100, 1)</code></pre>
+shares = expenses
+  with share = amount / total
+  with pct = round(share * 100, 1)</code></pre>
         <p>
           Because <code>with</code> works one row at a time, a total over the same table has to be a line of its own, as
           <code>total</code> is above. <code>row</code> is the row number, <code>prev</code> the value on the row before,
-          and <code>prev(n)</code> goes back <code>n</code> rows, which gives running totals:
-          <code>balance = if(row = 1, amount, prev + amount)</code>.
+          and <code>prev(n)</code> goes back <code>n</code> rows, which is what a calculation that builds on the
+          row before needs: <code>balance = if(row = 1, start, prev * (1 + rate) + deposit)</code>. For a running total,
+          see below.
+        </p>
+
+        <h3 id="running">Running totals and totals per group</h3>
+        <p>
+          Inside a <code>with</code>, the thing an aggregate adds up can say which rows it takes.
+          <code>per category</code> keeps the rows of the same category as this row, and <code>running</code> keeps the
+          rows up to this one, in the order of the table. They go after the value, <code>running</code> first, and a
+          <code>where</code> goes last.
+        </p>
+        <pre data-snurra><code>expenses = table
+  category, amount
+  rent, 12500
+  food, 2300
+  food, 800
+  rent, 12500
+
+left = expenses
+  with spent = sum(amount running per category),
+       share = amount / sum(amount per category)</code></pre>
+        <p>
+          <code>sum(amount per category)</code> is the total of the row's category on every row, so it gives a share.
+          A row that fails a <code>where</code> still shows what the other rows add up to. Sort the table in an earlier
+          statement if the order matters.
         </p>
 
         <h2 id="groups">Grouping: by</h2>
         <p>
-          <code>table by key</code> makes one row per distinct key. The indented lines below are the columns; inside
-          <code>sum</code>, <code>avg</code>, <code>min</code>, <code>max</code>, <code>count</code> and friends you see the
-          group's source rows.
+          <code>table by key</code> makes one row per distinct key. The <code>with</code> right after it says what each
+          group gives, columns separated by commas; inside <code>sum</code>, <code>avg</code>, <code>min</code>,
+          <code>max</code>, <code>count</code> and friends you see the group's source rows. A <code>with</code> after that
+          works on the finished table, one row at a time.
         </p>
         <pre data-snurra><code>expenses = table
   dept,  amount
@@ -402,21 +471,20 @@ budget = table
   Ops,   30000
 
 per_dept = expenses by dept
-  total = sum(amount)
-  limit = lookup budget.limit where budget.dept = expenses.dept
-  left = limit - total
+  with total = sum(amount),
+       limit = lookup budget.limit where budget.dept = expenses.dept,
+       left = limit - total
   sort total desc</code></pre>
         <ul>
           <li>Several keys are comma-separated. A computed key needs a name: <code>by month = month_start(date)</code>.</li>
-          <li>Rows come out sorted by the keys. A last <code>sort total desc</code> line sorts by something else (<code>asc</code> is the default).</li>
-          <li>Groups match without regard to case. A blank key becomes a visible <code>(blank)</code> group.</li>
+          <li>Rows come out sorted by the keys. A <code>sort total desc</code> step sorts by something else (<code>asc</code> is the default).</li>
+          <li>Groups match exactly, so <code>Sales</code> and <code>sales</code> are two groups. A blank key becomes a visible <code>(blank)</code> group.</li>
           <li>Using a column that has many values per group outside an aggregate is an error, with the fix in the message.</li>
         </ul>
 
         <h3>Sorting and limiting</h3>
         <p>
-          Both <code>by</code> and <code>with</code> take a last <code>sort</code> line and a <code>limit</code> line after
-          it. <code>limit 3</code> keeps at most three rows: the first three, in whatever order the table has. Sort first and
+          <code>sort</code> and <code>limit</code> are steps at the end of a chain. <code>limit 3</code> keeps at most three rows: the first three, in whatever order the table has. Sort first and
           you get a top list.
         </p>
         <pre data-snurra><code>utgifter = table
@@ -427,23 +495,23 @@ per_dept = expenses by dept
   Dan,  700
 
 top_spenders = utgifter by vem
-  total = sum(belopp)
+  with total = sum(belopp)
   sort total desc
   limit 3
 
-biggest = utgifter with
-  double = belopp * 2
+biggest = utgifter
+  with double = belopp * 2
   sort belopp desc
   limit 2</code></pre>
         <ul>
           <li>The result says "3 of 4 rows" so a reader can see that rows were left out. Anything calculated from it afterwards only sees the kept rows.</li>
           <li>The number can be a name, so a reader can change how many to show: <code>limit shown</code>. It must be a whole number, 0 or more.</li>
           <li>Rows that tie at the cut-off stay in the order they had, so the result never changes between runs.</li>
-          <li>In a <code>with</code>, the sort happens last: <code>row</code> and <code>prev</code> still follow the original order, and the sort can use any column.</li>
+          <li>After a <code>with</code>, the sort happens last: <code>row</code> and <code>prev</code> still follow the original order, and the sort can use any column.</li>
           <li><code>limit</code> is only a keyword at the start of a line with no <code>=</code>, so it still works as a column name.</li>
         </ul>
         <p>
-          When all you want is the top of a table, no <code>by</code> or <code>with</code> is needed:
+          When all you want is the top of a table, no <code>by</code> is needed:
           <code>sort</code> and <code>limit</code> can end any table expression, on one line.
         </p>
         <pre data-snurra><code>utgifter = table
@@ -456,8 +524,8 @@ biggest = utgifter with
 top2 = utgifter sort belopp desc limit 2
 big = utgifter where belopp > 300 sort belopp, vem</code></pre>
         <ul>
-          <li>They come last in the chain, <code>sort</code> first: nothing, not even a <code>where</code>, can follow them. Either one can be left out.</li>
-          <li>The keys work as in a block (several, <code>asc</code> or <code>desc</code>, expressions over the columns), and so does the number.</li>
+          <li>They come last in the chain, <code>sort</code> first: only <code>keep</code> or <code>drop</code>, once, can follow them, not even a <code>where</code>. Either one can be left out.</li>
+          <li>The keys can be several, with <code>asc</code> or <code>desc</code>, and expressions over the columns, and so can the number.</li>
         </ul>
 
         <h2 id="series">Series</h2>
@@ -540,8 +608,8 @@ deposit = 1_000
 growth = year 0..30  @chart line
   balance = if(row = 1, start, prev * (1 + rate) + deposit)</code></pre>
         <p>
-          <code>@chart bar</code> suits categories, such as the groups of a <code>by</code>. The hint goes on the line
-          that makes the table, and covers the lines indented below it.
+          <code>@chart bar</code> suits categories, such as the groups of a <code>by</code>. The hint goes at the end of
+          the last line of the statement that makes the table.
         </p>
         <pre data-snurra><code>expenses = table
   dept, amount
@@ -549,8 +617,8 @@ growth = year 0..30  @chart line
   Ops, 800
   Sales, 300
 
-per_dept = expenses by dept  @chart bar
-  total = sum(amount)</code></pre>
+per_dept = expenses by dept
+  with total = sum(amount)  @chart bar</code></pre>
         <p>
           There are no chart settings. The axis always starts at zero, a blank cell is a gap and never a zero, and a column
           marked <code>@hidden</code> is left out. Columns on very different scales share one axis, so hide the small one or
@@ -558,7 +626,7 @@ per_dept = expenses by dept  @chart bar
         </p>
         <p>
           Like every hint, <code>@chart</code> never changes what a line means: the table has the same values with or
-          without it. It is an error on anything that isn't a table, inside a block, or when no column besides the first
+          without it. It is an error on anything that isn't a table, on a step line before the last, or when no column besides the first
           holds numbers, and the message says so. Hovering a point or a bar shows its value. The table under a chart starts
           closed, with its size shown; click its arrow to see every number, and your choice is remembered.
         </p>
