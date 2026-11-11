@@ -13,8 +13,8 @@
         location.replace(url.href);
       }
     </script>
-    <script type="module" crossorigin src="./assets/main-kHCxP-44.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/main-DpYDUT3l.css">
+    <script type="module" crossorigin src="./assets/main-fKYHRtJ7.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/main-BE2RYwtS.css">
   </head>
   <body>
     <header>
@@ -22,7 +22,6 @@
       <div class="header-actions">
         <button type="button" id="problems-badge" hidden></button>
         <div class="views" role="group" aria-label="View">
-          <button type="button" data-view="code" title="Code only">Code</button>
           <button type="button" data-view="code-results" title="Code, with the results beside it">Code &amp; results</button>
           <button type="button" data-view="inputs-results" title="Inputs and results only, without the code">Inputs &amp; results</button>
           <button type="button" data-view="output" title="Results only, without the code or the inputs">Results</button>
@@ -80,8 +79,8 @@
       // and no line numbers, then jump to the saved ones. Mirrors what main.ts does (see setViewMode and setLineNumbers).
       (function () {
         try {
-          var modes = ["code", "code-results", "inputs-results", "output"];
-          var legacy = { split: "code-results", calculator: "inputs-results", results: "inputs-results" };
+          var modes = ["code-results", "inputs-results", "output"];
+          var legacy = { split: "code-results", code: "code-results", calculator: "inputs-results", results: "inputs-results" };
           var fromHash = /^#view=([a-z-]+)(?:&sheet=.*)?$/.exec(location.hash);
           var saved = localStorage.getItem("snurra:view");
           var mode = (fromHash && modes.indexOf(fromHash[1]) >= 0 && fromHash[1]) || legacy[saved] || (modes.indexOf(saved) >= 0 && saved) || "code-results";

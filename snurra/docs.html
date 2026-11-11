@@ -137,6 +137,7 @@
           <li><a href="#series">Series</a></li>
           <li><a href="#paste">Pasting data</a></li>
           <li><a href="#hidden">Hiding lines</a></li>
+          <li><a href="#notes">Notes for the reader</a></li>
           <li><a href="#options">Offering choices</a></li>
           <li><a href="#charts">Charts</a></li>
           <li><a href="#sheets">Sheets</a></li>
@@ -531,21 +532,22 @@ big = utgifter where belopp > 300 sort belopp, vem</code></pre>
         <h2 id="series">Series</h2>
         <p>
           When each row builds on the one before (savings, loans, schedules) use a series: a counter and a range with
-          <code>..</code>.
+          <code>..</code>, then its columns in a <code>with</code> like any table's.
         </p>
         <pre data-snurra><code>start = 10_000
 rate = 5%
 deposit = 1_000
 
 growth = year 1..30
-  balance = if(row = 1, start, prev) * (1 + rate) + deposit
-  interest = if(row = 1, balance - start, balance - prev.balance)
+  with balance = if(row = 1, start, prev) * (1 + rate) + deposit,
+       interest = if(row = 1, balance - start, balance - prev.balance)
 
 final = last(growth.balance)</code></pre>
         <p>
           Each row here is the balance at the end of that year, so the first one already has a year of interest and a
           deposit in it.
-          <code>prev</code> is this column in the previous row, <code>prev.name</code> any column of the previous row.
+          <code>prev</code> is this column in the previous row, <code>prev.name</code> any column of the previous row, also one
+          further down the list. A <code>with</code> straight after a range works out its columns one row at a time.
           Reaching before the first row is an error, which is why the first row is written out with <code>if(row = 1, …)</code>.
           <code>prev_or(x)</code> is shorthand for <code>if(row = 1, x, prev)</code>, so the balance above can be
           <code>prev_or(start) * (1 + rate) + deposit</code>. <code>prev_or(x, n)</code> is
@@ -580,6 +582,22 @@ total = brutto * 2</code></pre>
           a "Show N hidden" switch, and a reader is told that something is hidden.
         </p>
 
+        <h2 id="notes">Notes for the reader</h2>
+        <p>
+          <code>@note</code> adds a sentence of free text that the reader sees with a line: under an input, beside a
+          result, and under the name of a table. It goes at the end of a statement or, for a longer text, on a line of its own
+          directly above it. The text is the rest of the line up to a <code>#</code> comment, so it needs no quotes.
+        </p>
+        <pre data-snurra><code>@note What one unit costs, before VAT
+price = 100
+
+total = price * 1.25   @note The price with VAT</code></pre>
+        <p>
+          Put the text in quotes if it has a <code>#</code> or an <code>@</code> in it, or if another hint follows it:
+          <code>@note "Costs # extra"  @hidden</code>. A note goes on a whole statement, not on a column of a block, and a
+          <code>@hidden</code> line shows no note.
+        </p>
+
         <h2 id="options">Offering choices</h2>
         <p>
           Put <code>@options</code> and some more values at the end of an input to let the reader try them with one
@@ -605,8 +623,8 @@ cost = price * interest</code></pre>
 rate = 5%
 deposit = 1_000
 
-growth = year 0..30  @chart line
-  balance = if(row = 1, start, prev * (1 + rate) + deposit)</code></pre>
+growth = year 0..30
+  with balance = if(row = 1, start, prev * (1 + rate) + deposit)  @chart line</code></pre>
         <p>
           <code>@chart bar</code> suits categories, such as the groups of a <code>by</code>. The hint goes at the end of
           the last line of the statement that makes the table.
