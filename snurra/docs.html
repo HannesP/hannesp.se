@@ -129,7 +129,6 @@
           <li><a href="#math">Operators and functions</a></li>
           <li><a href="#logic">Conditions</a></li>
           <li><a href="#dates">Dates</a></li>
-          <li><a href="#lists">Lists</a></li>
           <li><a href="#tables">Tables</a></li>
           <li><a href="#filter">Filtering and lookups</a></li>
           <li><a href="#columns">New columns: with</a></li>
@@ -233,7 +232,7 @@ shipping = if(
         </p>
         <table>
           <tr><th>Function</th><th>What it does</th></tr>
-          <tr><td><code>min</code>, <code>max</code>, <code>avg</code>, <code>sum</code></td><td>Over several values, <code>max(0, x)</code>, or over one column or list, <code>sum(budget.limit)</code></td></tr>
+          <tr><td><code>min</code>, <code>max</code>, <code>avg</code>, <code>sum</code></td><td>Over several values, <code>max(0, x)</code>, or over one column, <code>sum(budget.limit)</code></td></tr>
           <tr><td><code>count</code></td><td>Non-blank values in a column, or rows in a table</td></tr>
           <tr><td><code>mode</code></td><td>The most common value (a tie goes to the smallest)</td></tr>
           <tr><td><code>first</code>, <code>last</code></td><td>First or last filled value of a column</td></tr>
@@ -288,18 +287,6 @@ quarter = floor((month_of(due) + 2) / 3)</code></pre>
           <li>Impossible dates (<code>2023-02-29</code>) are errors, never rolled over to the next month. <code>2024 - 03 - 01</code> with spaces is subtraction.</li>
         </ul>
 
-        <h2 id="lists">Lists</h2>
-        <p>Commas make a list. Everything that works on one value works on every item.</p>
-        <pre data-snurra><code>weights = 60, 70, 80
-h = 1.8
-bmi = weights / h / h
-tall = weights where weights > 65
-total = sum(weights)</code></pre>
-        <p>
-          Two lists combine item by item if they have the same length; a list and a single value always combine. A list
-          is an input when it is written out with values only, so it shows in the form.
-        </p>
-
         <h2 id="tables">Tables</h2>
         <p>
           <code>name = table</code> followed by indented lines: the first is the column names, the rest are rows. Cells are
@@ -311,13 +298,12 @@ total = sum(weights)</code></pre>
   Ops,   30000
   Admin,</code></pre>
         <ul>
-          <li><code>budget.limit</code> is a whole column. Columns of the same table combine row by row: <code>budget.limit * 1.25</code>.</li>
+          <li><code>budget.limit</code> is a whole column. A <code>with</code> works on columns row by row: <code>budget with raised = limit * 1.25</code>. A column outside a table is only used in an aggregate, like <code>sum(budget.limit)</code>.</li>
           <li>Text with a comma in it is quoted: <code>"Smith, John"</code>. A column is numbers if every filled cell is a number, otherwise text.</li>
           <li>A blank is not zero. Totals skip blanks, and arithmetic with a blank gives a blank.</li>
           <li>A row with the wrong number of cells makes the whole table an error, so a total never silently skips data.</li>
           <li>Tables are inputs: in the Inputs panel they are an editable grid. Tab and Enter move between cells, and typing in the empty last row adds a row.</li>
           <li>Columns line up automatically as you type. The spaces are only for reading.</li>
-          <li><code>table of weights, bmi</code> builds a table from lists of the same length.</li>
         </ul>
         <p>
           A table with many columns can be narrowed to the ones worth showing: <code>keep</code> names the columns to
@@ -339,7 +325,6 @@ renamed = wide keep dept as team, limit as cap</code></pre>
           <code>top = wide keep dept, limit sort limit desc limit 1</code>. After them, once, they only choose what is
           shown, so a column that was needed for the order can go:
           <code>top = wide sort limit desc limit 1 keep dept</code>.
-          Use <code>table of</code> to build a table from lists, which <code>keep</code> cannot do.
         </p>
         <p>
           A table with a date (or month, or whole number) column that has gaps can be given a row for every step with
@@ -364,13 +349,13 @@ renamed = wide keep dept as team, limit as cap</code></pre>
         </p>
         <p>
           A <code>by</code> is a step like the others: the <code>with</code> right after it says what each group gives,
-          and the steps after that see the finished table, as in <code>fig = expenses by date across descr with total =
-          sum(amount) complete</code>.
+          and the steps after that see the finished table, as in <code>fig = expenses by date across descr with sum(amount)
+          complete</code>.
         </p>
 
         <h2 id="filter">Filtering and lookups</h2>
         <p>
-          <code>where</code> keeps the rows (or list items) that match. <code>lookup</code> is the same, but insists on
+          <code>where</code> keeps the rows that match. <code>lookup</code> is the same, but insists on
           exactly one match, and gives a single value or a row.
         </p>
         <pre data-snurra><code>budget = table
@@ -610,7 +595,7 @@ cost = price * interest</code></pre>
           The value on the line is one of the choices, so the options don't repeat it. The buttons are in order: numbers
           by size, dates and durations by time, true before false, and text alphabetically (capitals don't matter). Picking
           a button swaps it with the value on the line, so the list is always the other values. The options are plain values of the
-          same kind as the input, and the hint only goes on an input that is a single value (not a list or a table). The
+          same kind as the input, and the hint only goes on an input that is a single value (not a table). The
           buttons are in the Inputs panel; Results view shows only the answers, so it has none.
         </p>
 

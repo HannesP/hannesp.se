@@ -13,8 +13,8 @@
         location.replace(url.href);
       }
     </script>
-    <script type="module" crossorigin src="./assets/main-fKYHRtJ7.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/main-BE2RYwtS.css">
+    <script type="module" crossorigin src="./assets/main-DQCmH_MP.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/main-DlQGlUoH.css">
   </head>
   <body>
     <header>
@@ -51,11 +51,12 @@
         <div id="sheet-tabs" role="tablist" aria-label="Sheets" hidden></div>
         <div class="pane" id="pane-inputs">
           <section aria-label="Inputs">
-            <p class="hint" id="inputs-hint">Inputs are lines that are just a value, like price = 100, rate = 5%, city = "Oslo", due = 2024-03-01 or a list or table. Each one gets a field here that anyone can change without touching the code.</p>
+            <p class="hint" id="inputs-hint">Inputs are lines that are just a value, like price = 100, rate = 5%, city = "Oslo", due = 2024-03-01 or a table. Each one gets a field here that anyone can change without touching the code.</p>
             <label class="hidden-toggle" id="hidden-toggle-inputs" hidden>
               <input type="checkbox" id="show-hidden-inputs" />
               <span id="hidden-count-inputs"></span>
             </label>
+            <p class="borrowed" id="inputs-from" hidden></p>
             <div id="inputs"></div>
           </section>
         </div>
@@ -65,6 +66,7 @@
               <input type="checkbox" id="show-hidden-results" />
               <span id="hidden-count-results"></span>
             </label>
+            <p class="borrowed" id="results-from" hidden></p>
             <div id="results"></div>
           </section>
           <section id="problems-section" hidden>
